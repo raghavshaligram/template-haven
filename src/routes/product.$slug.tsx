@@ -1,11 +1,17 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Check, ChevronDown, Play } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Play, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Stars } from "@/components/site/Stars";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useCart } from "@/lib/cart";
 import { discountPct, getProduct, getProductById, money, products, reviewsFor } from "@/data/shop";
 
@@ -15,11 +21,15 @@ export const Route = createFileRoute("/product/$slug")({
   loader: ({ params }) => {
     const product = getProduct(params.slug);
     if (!product) throw notFound();
-    return { name: product.name, tagline: product.tagline };
+    return {
+      name: product.name,
+      tagline: product.tagline,
+      meta: product.meta_description ?? product.tagline,
+    };
   },
   head: ({ loaderData }) => {
     const title = loaderData ? `${loaderData.name} — Ledger&Leaf` : "Template — Ledger&Leaf";
-    const description = loaderData?.tagline ?? "Spreadsheet template for Excel and Google Sheets.";
+    const description = loaderData?.meta ?? "Spreadsheet template for Excel and Google Sheets.";
     return {
       meta: [
         { title },
@@ -119,10 +129,17 @@ function ProductPage() {
 
         {/* Buy box */}
         <div>
-          <h1 className="font-display text-3xl md:text-4xl">{product.name}</h1>
+          <h1 className="font-display text-3xl leading-tight md:text-[2.5rem]">
+            {product.hero_title ?? product.name}
+          </h1>
+          {product.hero_subtitle && (
+            <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+              {product.hero_subtitle}
+            </p>
+          )}
           <a
             href="#reviews"
-            className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
+            className="mt-4 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
           >
             <Stars rating={product.rating_avg} />
             <span>
@@ -290,6 +307,125 @@ function ProductPage() {
           </div>
         </aside>
       </section>
+
+      {/* What's included */}
+      {product.whats_included && (
+        <section className="mt-16">
+          <h2 className="font-display text-2xl">What's included</h2>
+          <div className="mt-6 grid gap-x-8 gap-y-3.5 rounded-2xl border border-border/60 bg-card p-8 shadow-card sm:grid-cols-2">
+            {product.whats_included.map((item) => (
+              <div key={item} className="flex gap-3">
+                <Check size={18} className="mt-0.5 shrink-0 text-primary" />
+                <span className="text-sm text-foreground/90">{item}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* How it works */}
+      {product.how_it_works && (
+        <section className="mt-16">
+          <h2 className="font-display text-2xl">How it works</h2>
+          <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {product.how_it_works.map((step, i) => (
+              <li
+                key={step}
+                className="rounded-2xl border border-border/60 bg-card p-5 shadow-card"
+              >
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+                  {i + 1}
+                </span>
+                <p className="mt-3 text-sm leading-relaxed text-foreground/90">{step}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
+      {/* Why this version */}
+      {product.why_this && (
+        <section className="mt-16">
+          <h2 className="font-display text-2xl">Why this version</h2>
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+            {product.why_this.map((w) => (
+              <li
+                key={w}
+                className="flex gap-3 rounded-xl border border-border/60 bg-card p-4 shadow-card"
+              >
+                <Sparkles size={17} className="mt-0.5 shrink-0 text-accent" />
+                <span className="text-sm text-foreground/90">{w}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Perfect for */}
+      {product.perfect_for && (
+        <section className="mt-16">
+          <h2 className="font-display text-2xl">Perfect for</h2>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            {product.perfect_for.map((p) => (
+              <div key={p} className="flex gap-3 rounded-xl bg-secondary/60 p-4">
+                <Check size={17} className="mt-0.5 shrink-0 text-primary" />
+                <span className="text-sm text-foreground/90">{p}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Bundle callout */}
+      {product.bundle_callout && (
+        <section className="mt-16">
+          <Link
+            to="/product/$slug"
+            params={{ slug: product.bundle_callout.slug }}
+            className="flex flex-col items-start justify-between gap-4 rounded-2xl bg-primary p-7 text-primary-foreground shadow-soft transition-transform hover:-translate-y-0.5 sm:flex-row sm:items-center"
+          >
+            <div className="flex items-center gap-3">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-foreground/15">
+                <Sparkles size={20} />
+              </span>
+              <div>
+                <p className="font-display text-lg text-primary-foreground">
+                  {product.bundle_callout.text}
+                </p>
+                <p className="text-sm text-primary-foreground/80">
+                  Bundle and save versus buying separately.
+                </p>
+              </div>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-accent-foreground">
+              View bundle <ArrowRight size={16} />
+            </span>
+          </Link>
+        </section>
+      )}
+
+      {/* FAQ */}
+      {product.faqs && (
+        <section className="mt-16">
+          <h2 className="font-display text-2xl">Frequently asked questions</h2>
+          <Accordion
+            type="single"
+            collapsible
+            className="mt-6 overflow-hidden rounded-2xl border border-border/60 bg-card px-6 shadow-card"
+          >
+            {product.faqs.map((f, i) => (
+              <AccordionItem key={f.q} value={`faq-${i}`}>
+                <AccordionTrigger className="text-left text-sm font-medium hover:no-underline">
+                  {f.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
+                  {f.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </section>
+      )}
 
       {/* Reviews */}
       <section id="reviews" className="mt-16 scroll-mt-24">
