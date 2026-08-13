@@ -1,6 +1,20 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowRight, Check, ChevronDown, Play, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Check,
+  ChevronDown,
+  Download,
+  FileSpreadsheet,
+  Heart,
+  Lock,
+  Play,
+  Share2,
+  ShieldCheck,
+  Sparkles,
+  Store,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Stars } from "@/components/site/Stars";
 import { ProductCard } from "@/components/site/ProductCard";
@@ -13,7 +27,15 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useCart } from "@/lib/cart";
-import { discountPct, getProduct, getProductById, money, products, reviewsFor } from "@/data/shop";
+import {
+  discountPct,
+  getCategory,
+  getProduct,
+  getProductById,
+  money,
+  products,
+  reviewsFor,
+} from "@/data/shop";
 
 const REVIEWS_PER_PAGE = 3;
 
@@ -50,6 +72,19 @@ function ProductPage() {
   const [img, setImg] = useState(0);
   const [colorway, setColorway] = useState(product.colorway_variants[0]!.name);
   const [reviewPage, setReviewPage] = useState(1);
+  const [fav, setFav] = useState(false);
+
+  const category = getCategory(product.category);
+
+  function share() {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    if (typeof navigator !== "undefined" && navigator.share) {
+      navigator.share({ title: product.name, url }).catch(() => {});
+    } else if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard");
+    }
+  }
 
   const productReviews = reviewsFor(product.id);
   const related = products.filter((p) => p.id !== product.id).slice(0, 4);
@@ -75,28 +110,40 @@ function ProductPage() {
   }
 
   return (
-    <div className="container-page py-10">
-      <div className="grid gap-10 lg:grid-cols-2">
-        {/* Gallery */}
-        <div>
-          <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-secondary shadow-card">
-            <img
-              src={product.images[img]}
-              alt={`${product.name} preview ${img + 1}`}
-              width={1024}
-              height={1024}
-              className="product-media aspect-square w-full object-cover"
-            />
-            <span className="product-wash" aria-hidden />
-          </div>
-          <div className="mt-4 flex gap-3">
+    <div className="container-page py-8">
+      {/* Breadcrumb */}
+      <nav className="mb-5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+        <Link to="/" className="hover:text-primary">
+          Home
+        </Link>
+        <span aria-hidden>/</span>
+        {category ? (
+          <Link
+            to="/collections/$slug"
+            params={{ slug: category.slug }}
+            className="hover:text-primary"
+          >
+            {category.name}
+          </Link>
+        ) : (
+          <span>Templates</span>
+        )}
+        <span aria-hidden>/</span>
+        <span className="line-clamp-1 text-foreground/70">{product.name}</span>
+      </nav>
+
+      <div className="grid items-start gap-10 lg:grid-cols-[1.15fr_1fr]">
+        {/* Gallery: thumbnail rail + main image */}
+        <div className="flex flex-col-reverse gap-3 sm:flex-row">
+          <div className="flex gap-3 sm:w-[70px] sm:flex-col">
             {product.images.map((src, i) => (
               <button
                 key={src + i}
                 onClick={() => setImg(i)}
+                onMouseEnter={() => setImg(i)}
                 aria-label={`View image ${i + 1}`}
-                className={`h-20 w-20 overflow-hidden rounded-xl border-2 ${
-                  i === img ? "border-primary" : "border-transparent"
+                className={`aspect-square w-16 overflow-hidden rounded-lg border-2 transition sm:w-full ${
+                  i === img ? "border-primary" : "border-border/60 hover:border-border"
                 }`}
               >
                 <img
@@ -112,7 +159,7 @@ function ProductPage() {
             <button
               aria-label="Play walkthrough video"
               onClick={() => toast("Walkthrough video coming soon")}
-              className="relative h-20 w-20 overflow-hidden rounded-xl border-2 border-transparent"
+              className="relative aspect-square w-16 overflow-hidden rounded-lg border-2 border-border/60 hover:border-border sm:w-full"
             >
               <img
                 src={product.images[0]}
@@ -120,15 +167,55 @@ function ProductPage() {
                 loading="lazy"
                 width={80}
                 height={80}
-                className="h-full w-full object-cover brightness-75"
+                className="h-full w-full object-cover brightness-[0.55]"
               />
-              <Play size={20} className="absolute inset-0 m-auto text-background" />
+              <Play size={18} className="absolute inset-0 m-auto text-background" />
+            </button>
+          </div>
+
+          <div className="relative flex-1">
+            <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-secondary shadow-card">
+              <img
+                src={product.images[img]}
+                alt={`${product.name} preview ${img + 1}`}
+                width={1024}
+                height={1024}
+                className="product-media aspect-square w-full object-cover"
+              />
+              <span className="product-wash" aria-hidden />
+              {product.best_seller && (
+                <span className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary-foreground shadow-sm">
+                  Bestseller
+                </span>
+              )}
+            </div>
+            <button
+              type="button"
+              aria-label={fav ? "Remove from favorites" : "Add to favorites"}
+              onClick={() => {
+                setFav((v) => !v);
+                toast.success(fav ? "Removed from favorites" : "Saved to favorites");
+              }}
+              className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-background/90 text-foreground/70 shadow-sm backdrop-blur transition hover:text-primary"
+            >
+              <Heart size={18} className={fav ? "fill-accent text-accent" : ""} />
             </button>
           </div>
         </div>
 
         {/* Buy box */}
-        <div>
+        <div className="lg:sticky lg:top-32 lg:self-start">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            {product.best_seller && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary">
+                <BadgeCheck size={13} /> Bestseller
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2.5 py-1 text-[11px] font-semibold text-accent-foreground">
+              <Sparkles size={12} className="text-accent" /> Star shop
+            </span>
+            <span className="text-[11px] text-muted-foreground">Loved by 62,400+ planners</span>
+          </div>
           <h1 className="font-display text-3xl leading-tight md:text-[2.5rem]">
             {product.hero_title ?? product.name}
           </h1>
@@ -161,6 +248,22 @@ function ProductPage() {
             )}
           </div>
 
+          <div className="mt-5 flex flex-wrap gap-2">
+            {[
+              { icon: Download, label: "Instant download" },
+              { icon: FileSpreadsheet, label: "Excel + Google Sheets" },
+              { icon: BadgeCheck, label: "One-time purchase" },
+              { icon: Sparkles, label: "Lifetime updates" },
+            ].map((h) => (
+              <span
+                key={h.label}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground/80"
+              >
+                <h.icon size={13} className="text-primary" /> {h.label}
+              </span>
+            ))}
+          </div>
+
           <div className="mt-7">
             <p className="mb-2 text-sm font-medium">
               Colorway: <span className="text-muted-foreground">{colorway}</span>
@@ -185,24 +288,94 @@ function ProductPage() {
             <Button
               size="lg"
               onClick={() => addToCart()}
-              className="h-12 rounded-full bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
+              className="h-12 rounded-full bg-accent text-[15px] font-semibold text-accent-foreground hover:bg-accent/90"
             >
               Add to cart
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="h-12 rounded-full"
+              className="h-12 rounded-full border-border text-[15px]"
               onClick={() => addToCart("Straight to checkout")}
               asChild={false}
             >
               Buy now
             </Button>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setFav((v) => !v);
+                  toast.success(fav ? "Removed from favorites" : "Saved to favorites");
+                }}
+                className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full border border-border bg-card text-sm font-medium hover:border-primary/40"
+              >
+                <Heart size={16} className={fav ? "fill-accent text-accent" : ""} />
+                {fav ? "Saved" : "Favorite"}
+              </button>
+              <button
+                type="button"
+                onClick={share}
+                className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full border border-border bg-card text-sm font-medium hover:border-primary/40"
+              >
+                <Share2 size={16} /> Share
+              </button>
+            </div>
           </div>
-          <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-            <Check size={16} className="text-primary" />
-            Instant digital download — no physical item shipped.
-          </p>
+
+          {/* Trust / guarantee */}
+          <div className="mt-6 rounded-2xl border border-border/60 bg-card p-1.5 shadow-card">
+            {[
+              {
+                icon: Download,
+                title: "Instant digital download",
+                text: "Link on the confirmation page + emailed to you.",
+              },
+              {
+                icon: FileSpreadsheet,
+                title: "Excel & Google Sheets",
+                text: "Use it on any device, including Mac and mobile.",
+              },
+              {
+                icon: Lock,
+                title: "Secure checkout",
+                text: "Visa · Mastercard · Amex · Apple Pay · PayPal.",
+              },
+              {
+                icon: ShieldCheck,
+                title: "We'll make it right",
+                text: "Broken file or wrong item? We fix it or refund it.",
+              },
+            ].map((r) => (
+              <div key={r.title} className="flex items-start gap-3 rounded-xl px-3.5 py-3">
+                <r.icon size={18} className="mt-0.5 shrink-0 text-primary" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">{r.title}</p>
+                  <p className="text-xs text-muted-foreground">{r.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Meet the maker */}
+          <div className="mt-4 flex items-center gap-3 rounded-2xl border border-border/60 bg-secondary/50 p-4">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary text-base font-semibold text-primary-foreground">
+              E
+            </span>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-foreground">Ledger&amp;Leaf</p>
+              <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Store size={12} /> Star shop · Loved by 62,400+ planners
+              </p>
+            </div>
+            <Link
+              to="/about"
+              hash="contact"
+              className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium hover:border-primary/40"
+            >
+              Message
+            </Link>
+          </div>
 
           {product.is_bundle && (
             <div className="mt-8 rounded-2xl bg-card p-5 shadow-soft">
