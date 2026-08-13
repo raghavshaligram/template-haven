@@ -5,20 +5,9 @@ import { toast } from "sonner";
 import { Stars } from "@/components/site/Stars";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useCart } from "@/lib/cart";
-import {
-  discountPct,
-  getProduct,
-  getProductById,
-  money,
-  products,
-  reviewsFor,
-} from "@/data/shop";
+import { discountPct, getProduct, getProductById, money, products, reviewsFor } from "@/data/shop";
 
 const REVIEWS_PER_PAGE = 3;
 
@@ -30,8 +19,7 @@ export const Route = createFileRoute("/product/$slug")({
   },
   head: ({ loaderData }) => {
     const title = loaderData ? `${loaderData.name} — Ledger&Leaf` : "Template — Ledger&Leaf";
-    const description =
-      loaderData?.tagline ?? "Spreadsheet template for Excel and Google Sheets.";
+    const description = loaderData?.tagline ?? "Spreadsheet template for Excel and Google Sheets.";
     return {
       meta: [
         { title },
@@ -81,14 +69,15 @@ function ProductPage() {
       <div className="grid gap-10 lg:grid-cols-2">
         {/* Gallery */}
         <div>
-          <div className="overflow-hidden rounded-3xl bg-secondary shadow-soft">
+          <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-secondary shadow-card">
             <img
               src={product.images[img]}
               alt={`${product.name} preview ${img + 1}`}
               width={1024}
               height={1024}
-              className="aspect-square w-full object-cover"
+              className="product-media aspect-square w-full object-cover"
             />
+            <span className="product-wash" aria-hidden />
           </div>
           <div className="mt-4 flex gap-3">
             {product.images.map((src, i) => (
@@ -100,7 +89,14 @@ function ProductPage() {
                   i === img ? "border-primary" : "border-transparent"
                 }`}
               >
-                <img src={src} alt="" loading="lazy" width={80} height={80} className="h-full w-full object-cover" />
+                <img
+                  src={src}
+                  alt=""
+                  loading="lazy"
+                  width={80}
+                  height={80}
+                  className="product-media h-full w-full object-cover"
+                />
               </button>
             ))}
             <button
@@ -124,7 +120,10 @@ function ProductPage() {
         {/* Buy box */}
         <div>
           <h1 className="font-display text-3xl md:text-4xl">{product.name}</h1>
-          <a href="#reviews" className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary">
+          <a
+            href="#reviews"
+            className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
+          >
             <Stars rating={product.rating_avg} />
             <span>
               {product.rating_avg} · {product.review_count.toLocaleString()} reviews
@@ -135,7 +134,9 @@ function ProductPage() {
             <span className="font-display text-3xl text-primary">{money(product.sale_price)}</span>
             {product.sale_price < product.price && (
               <>
-                <span className="text-lg text-muted-foreground line-through">{money(product.price)}</span>
+                <span className="text-lg text-muted-foreground line-through">
+                  {money(product.price)}
+                </span>
                 <span className="rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-accent-foreground">
                   {off}% off
                 </span>
@@ -225,8 +226,8 @@ function ProductPage() {
       </div>
 
       {/* Description */}
-      <section className="mt-16 grid gap-10 lg:grid-cols-[1.4fr_1fr]">
-        <div className="rounded-3xl bg-card p-8 shadow-soft">
+      <section className="mt-16 grid items-start gap-10 lg:grid-cols-[1.4fr_1fr]">
+        <div className="rounded-2xl border border-border/60 bg-card p-8 shadow-card">
           <h2 className="font-display text-2xl">{product.description.headline}</h2>
           {product.description.sections.map((s) => (
             <div key={s.title} className="mt-6">
