@@ -153,11 +153,12 @@ function Home() {
       <section className="container-page py-20">
         <div className="mx-auto max-w-3xl rounded-3xl bg-primary p-10 text-center text-primary-foreground shadow-lift md:p-14">
           <p className="font-display text-2xl leading-relaxed md:text-3xl">
-            “{testimonials[quote].quote}”
+            “{testimonials[quote]?.quote}”
           </p>
           <p className="mt-6 text-sm opacity-80">
-            {testimonials[quote].name} — {testimonials[quote].role}
+            {testimonials[quote]?.name} — {testimonials[quote]?.role}
           </p>
+
           <div className="mt-6 flex justify-center gap-2">
             {testimonials.map((t, i) => (
               <button
