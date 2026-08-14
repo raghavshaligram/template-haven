@@ -141,6 +141,13 @@ export function Header() {
             >
               PLR
             </Link>
+            <Link
+              to="/blog"
+              className="text-foreground/75 transition-colors hover:text-primary"
+              activeProps={{ className: "text-primary font-medium" }}
+            >
+              Blog
+            </Link>
             <Link to="/collections/$slug" params={{ slug: "freebies" }} className="ml-auto">
               <span className="rounded-full bg-accent/12 px-3 py-1 font-semibold text-accent">
                 Free templates →
@@ -158,6 +165,9 @@ export function Header() {
             ))}
             <Link to="/plr" onClick={() => setOpen(false)}>
               PLR
+            </Link>
+            <Link to="/blog" onClick={() => setOpen(false)}>
+              Blog
             </Link>
             <Link to="/account" onClick={() => setOpen(false)}>
               Account

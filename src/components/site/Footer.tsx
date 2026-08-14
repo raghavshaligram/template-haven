@@ -22,7 +22,11 @@ export function Footer() {
               </li>
             ))}
             <li>
-              <Link to="/collections/$slug" params={{ slug: "best-sellers" }} className="hover:text-primary">
+              <Link
+                to="/collections/$slug"
+                params={{ slug: "best-sellers" }}
+                className="hover:text-primary"
+              >
                 Best Sellers
               </Link>
             </li>
@@ -30,28 +34,83 @@ export function Footer() {
         </div>
 
         <div>
-          <h3 className="mb-4 font-display text-sm font-semibold uppercase tracking-wide">Resources</h3>
+          <h3 className="mb-4 font-display text-sm font-semibold uppercase tracking-wide">
+            Resources
+          </h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/faq" className="hover:text-primary">FAQ &amp; Help</Link></li>
-            <li><Link to="/faq" hash="digital-downloads" className="hover:text-primary">Digital downloads</Link></li>
-            <li><Link to="/faq" hash="how-templates-work" className="hover:text-primary">How templates work</Link></li>
-            <li><Link to="/faq" hash="access-issues" className="hover:text-primary">Access issues</Link></li>
+            <li>
+              <Link to="/blog" className="hover:text-primary">
+                Blog
+              </Link>
+            </li>
+            <li>
+              <Link to="/faq" className="hover:text-primary">
+                FAQ &amp; Help
+              </Link>
+            </li>
+            <li>
+              <Link to="/faq" hash="digital-downloads" className="hover:text-primary">
+                Digital downloads
+              </Link>
+            </li>
+            <li>
+              <Link to="/faq" hash="how-templates-work" className="hover:text-primary">
+                How templates work
+              </Link>
+            </li>
+            <li>
+              <Link to="/faq" hash="access-issues" className="hover:text-primary">
+                Access issues
+              </Link>
+            </li>
           </ul>
         </div>
 
         <div>
-          <h3 className="mb-4 font-display text-sm font-semibold uppercase tracking-wide">Company</h3>
+          <h3 className="mb-4 font-display text-sm font-semibold uppercase tracking-wide">
+            Company
+          </h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/about" className="hover:text-primary">About</Link></li>
-            <li><Link to="/about" hash="affiliate" className="hover:text-primary">Affiliate program</Link></li>
-            <li><Link to="/about" hash="contact" className="hover:text-primary">Contact</Link></li>
-            <li><Link to="/plr" className="hover:text-primary">Resell with PLR</Link></li>
+            <li>
+              <Link to="/about" className="hover:text-primary">
+                About
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" hash="affiliate" className="hover:text-primary">
+                Affiliate program
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" hash="contact" className="hover:text-primary">
+                Contact
+              </Link>
+            </li>
+            <li>
+              <Link to="/plr" className="hover:text-primary">
+                Resell with PLR
+              </Link>
+            </li>
           </ul>
-          <h3 className="mb-3 mt-6 font-display text-sm font-semibold uppercase tracking-wide">Legal</h3>
+          <h3 className="mb-3 mt-6 font-display text-sm font-semibold uppercase tracking-wide">
+            Legal
+          </h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/faq" hash="refund-policy" className="hover:text-primary">Refund policy</Link></li>
-            <li><Link to="/faq" hash="refund-policy" className="hover:text-primary">Terms of service</Link></li>
-            <li><Link to="/faq" hash="refund-policy" className="hover:text-primary">Privacy policy</Link></li>
+            <li>
+              <Link to="/faq" hash="refund-policy" className="hover:text-primary">
+                Refund policy
+              </Link>
+            </li>
+            <li>
+              <Link to="/faq" hash="refund-policy" className="hover:text-primary">
+                Terms of service
+              </Link>
+            </li>
+            <li>
+              <Link to="/faq" hash="refund-policy" className="hover:text-primary">
+                Privacy policy
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -61,10 +120,18 @@ export function Footer() {
           </h3>
           <Newsletter />
           <div className="mt-6 flex items-center gap-4 text-muted-foreground">
-            <a href="#" aria-label="Instagram"><Instagram size={18} /></a>
-            <a href="#" aria-label="YouTube"><Youtube size={18} /></a>
-            <a href="#" aria-label="Pinterest" className="text-sm font-semibold">P</a>
-            <a href="#" aria-label="TikTok" className="text-sm font-semibold">TT</a>
+            <a href="#" aria-label="Instagram">
+              <Instagram size={18} />
+            </a>
+            <a href="#" aria-label="YouTube">
+              <Youtube size={18} />
+            </a>
+            <a href="#" aria-label="Pinterest" className="text-sm font-semibold">
+              P
+            </a>
+            <a href="#" aria-label="TikTok" className="text-sm font-semibold">
+              TT
+            </a>
           </div>
         </div>
       </div>
