@@ -4,28 +4,31 @@ import {
   ArrowRight,
   BadgeCheck,
   Check,
-  ChevronDown,
   Download,
   FileSpreadsheet,
   Heart,
-  Lock,
+  Palette,
   Play,
   Share2,
-  ShieldCheck,
-  Sparkles,
   Store,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Stars } from "@/components/site/Stars";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useCart } from "@/lib/cart";
 import {
   discountPct,
@@ -91,6 +94,9 @@ function ProductPage() {
   const alsoBought = products.filter((p) => p.id !== product.id && !p.is_plr).slice(0, 2);
   const off = discountPct(product);
 
+  const included = product.whats_included ?? product.description.receive;
+  const howItWorks = product.how_it_works ?? product.description.after;
+
   const breakdown = useMemo(() => {
     return [5, 4, 3, 2, 1].map((star) => {
       const n = productReviews.filter((r) => r.rating === star).length;
@@ -110,10 +116,10 @@ function ProductPage() {
   }
 
   return (
-    <div className="container-page py-8">
+    <div className="container-page py-6">
       {/* Breadcrumb */}
-      <nav className="mb-5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-        <Link to="/" className="hover:text-primary">
+      <nav className="mb-4 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+        <Link to="/" className="hover:text-foreground">
           Home
         </Link>
         <span aria-hidden>/</span>
@@ -121,7 +127,7 @@ function ProductPage() {
           <Link
             to="/collections/$slug"
             params={{ slug: category.slug }}
-            className="hover:text-primary"
+            className="hover:text-foreground"
           >
             {category.name}
           </Link>
@@ -132,62 +138,23 @@ function ProductPage() {
         <span className="line-clamp-1 text-foreground/70">{product.name}</span>
       </nav>
 
-      <div className="grid items-start gap-10 lg:grid-cols-[1.15fr_1fr]">
-        {/* Gallery: thumbnail rail + main image */}
-        <div className="flex flex-col-reverse gap-3 sm:flex-row">
-          <div className="flex gap-3 sm:w-[70px] sm:flex-col">
-            {product.images.map((src, i) => (
-              <button
-                key={src + i}
-                onClick={() => setImg(i)}
-                onMouseEnter={() => setImg(i)}
-                aria-label={`View image ${i + 1}`}
-                className={`aspect-square w-16 overflow-hidden rounded-lg border-2 transition sm:w-full ${
-                  i === img ? "border-primary" : "border-border/60 hover:border-border"
-                }`}
-              >
-                <img
-                  src={src}
-                  alt=""
-                  loading="lazy"
-                  width={80}
-                  height={80}
-                  className="h-full w-full object-cover"
-                />
-              </button>
-            ))}
-            <button
-              aria-label="Play walkthrough video"
-              onClick={() => toast("Walkthrough video coming soon")}
-              className="relative aspect-square w-16 overflow-hidden rounded-lg border-2 border-border/60 hover:border-border sm:w-full"
-            >
-              <img
-                src={product.images[0]}
-                alt=""
-                loading="lazy"
-                width={80}
-                height={80}
-                className="h-full w-full object-cover brightness-[0.55]"
-              />
-              <Play size={18} className="absolute inset-0 m-auto text-background" />
-            </button>
-          </div>
-
-          <div className="relative flex-1">
-            <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-secondary shadow-card">
-              <img
-                src={product.images[img]}
-                alt={`${product.name} preview ${img + 1}`}
-                width={1024}
-                height={1024}
-                className="aspect-square w-full object-cover"
-              />
-              {product.best_seller && (
-                <span className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary-foreground shadow-sm">
-                  Bestseller
-                </span>
-              )}
-            </div>
+      <div className="grid items-start gap-10 lg:grid-cols-[1.05fr_0.95fr] xl:gap-14">
+        {/* ================= LEFT — gallery + all the detail ================= */}
+        <div>
+          {/* Main image */}
+          <div className="relative overflow-hidden rounded-xl border border-border bg-secondary">
+            <img
+              src={product.images[img]}
+              alt={`${product.name} preview ${img + 1}`}
+              width={1024}
+              height={1024}
+              className="aspect-square w-full object-cover"
+            />
+            {product.best_seller && (
+              <span className="absolute left-3 top-3 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground">
+                Bestseller
+              </span>
+            )}
             <button
               type="button"
               aria-label={fav ? "Remove from favorites" : "Add to favorites"}
@@ -195,415 +162,342 @@ function ProductPage() {
                 setFav((v) => !v);
                 toast.success(fav ? "Removed from favorites" : "Saved to favorites");
               }}
-              className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-background/90 text-foreground/70 shadow-sm backdrop-blur transition hover:text-primary"
+              className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-background/90 text-foreground/70 shadow-sm backdrop-blur transition hover:text-foreground"
             >
-              <Heart size={18} className={fav ? "fill-accent text-accent" : ""} />
+              <Heart size={17} className={fav ? "fill-accent text-accent" : ""} />
             </button>
           </div>
-        </div>
 
-        {/* Buy box */}
-        <div className="lg:sticky lg:top-32 lg:self-start">
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            {product.best_seller && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary">
-                <BadgeCheck size={13} /> Bestseller
-              </span>
-            )}
-            <span className="inline-flex items-center gap-1 rounded-full bg-accent/12 px-2.5 py-1 text-[11px] font-semibold text-accent">
-              <Sparkles size={12} className="text-accent" /> Star shop
-            </span>
-            <span className="text-[11px] text-muted-foreground">Loved by 62,400+ planners</span>
-          </div>
-          <h1 className="font-display text-2xl leading-tight md:text-[1.85rem]">
-            {product.hero_title ?? product.name}
-          </h1>
-          {product.hero_subtitle && (
-            <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
-              {product.hero_subtitle}
-            </p>
-          )}
-          <a
-            href="#reviews"
-            className="mt-4 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
-          >
-            <Stars rating={product.rating_avg} />
-            <span>
-              {product.rating_avg} · {product.review_count.toLocaleString()} reviews
-            </span>
-          </a>
-
-          <div className="mt-5 flex items-center gap-3">
-            <span className="font-display text-3xl text-primary">{money(product.sale_price)}</span>
-            {product.sale_price < product.price && (
-              <>
-                <span className="text-lg text-muted-foreground line-through">
-                  {money(product.price)}
-                </span>
-                <span className="rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-accent-foreground">
-                  {off}% off
-                </span>
-              </>
-            )}
-          </div>
-
-          <div className="mt-5 flex flex-wrap gap-2">
-            {[
-              { icon: Download, label: "Instant download" },
-              { icon: FileSpreadsheet, label: "Excel + Google Sheets" },
-              { icon: BadgeCheck, label: "One-time purchase" },
-              { icon: Sparkles, label: "Lifetime updates" },
-            ].map((h) => (
-              <span
-                key={h.label}
-                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground/80"
+          {/* Thumbnails BELOW, horizontal */}
+          <div className="mt-3 flex gap-2.5">
+            {product.images.map((src, i) => (
+              <button
+                key={src + i}
+                onClick={() => setImg(i)}
+                aria-label={`View image ${i + 1}`}
+                className={`aspect-square w-16 overflow-hidden rounded-lg border-2 transition ${
+                  i === img ? "border-foreground" : "border-border hover:border-foreground/40"
+                }`}
               >
-                <h.icon size={13} className="text-primary" /> {h.label}
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-7">
-            <p className="mb-2 text-sm font-medium">
-              Colorway: <span className="text-muted-foreground">{colorway}</span>
-            </p>
-            <div className="flex gap-3">
-              {product.colorway_variants.map((c) => (
-                <button
-                  key={c.name}
-                  onClick={() => setColorway(c.name)}
-                  title={c.name}
-                  aria-label={c.name}
-                  className={`h-9 w-9 rounded-full border-2 ${
-                    colorway === c.name ? "border-primary" : "border-border"
-                  }`}
-                  style={{ backgroundColor: c.hex }}
+                <img
+                  src={src}
+                  alt=""
+                  loading="lazy"
+                  width={64}
+                  height={64}
+                  className="h-full w-full object-cover"
                 />
-              ))}
-            </div>
+              </button>
+            ))}
+            <button
+              aria-label="Play walkthrough video"
+              onClick={() => toast("Walkthrough video coming soon")}
+              className="relative aspect-square w-16 overflow-hidden rounded-lg border-2 border-border hover:border-foreground/40"
+            >
+              <img
+                src={product.images[0]}
+                alt=""
+                loading="lazy"
+                width={64}
+                height={64}
+                className="h-full w-full object-cover brightness-[0.55]"
+              />
+              <Play size={16} className="absolute inset-0 m-auto text-background" />
+            </button>
           </div>
 
-          <div className="mt-8 flex flex-col gap-3">
-            <Button
-              size="lg"
-              onClick={() => addToCart()}
-              className="h-12 rounded-full bg-accent text-[15px] font-semibold text-accent-foreground hover:bg-accent/90"
-            >
-              Add to cart
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="h-12 rounded-full border-border text-[15px]"
-              onClick={() => addToCart("Straight to checkout")}
-              asChild={false}
-            >
-              Buy now
-            </Button>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setFav((v) => !v);
-                  toast.success(fav ? "Removed from favorites" : "Saved to favorites");
-                }}
-                className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full border border-border bg-card text-sm font-medium hover:border-primary/40"
-              >
-                <Heart size={16} className={fav ? "fill-accent text-accent" : ""} />
-                {fav ? "Saved" : "Favorite"}
-              </button>
-              <button
-                type="button"
-                onClick={share}
-                className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full border border-border bg-card text-sm font-medium hover:border-primary/40"
-              >
-                <Share2 size={16} /> Share
-              </button>
-            </div>
-          </div>
-
-          {/* Trust / guarantee */}
-          <div className="mt-6 rounded-2xl border border-border/60 bg-card p-1.5 shadow-card">
+          {/* Highlights — slim rows, no boxes */}
+          <div className="mt-7 space-y-2.5 border-t border-border pt-6">
+            <p className="text-sm font-semibold text-foreground">Highlights</p>
             {[
+              { icon: Download, text: "Instant digital download — DEMO + BLANK files" },
+              { icon: FileSpreadsheet, text: "Works in Excel (.xlsx) and Google Sheets" },
               {
-                icon: Download,
-                title: "Instant digital download",
-                text: "Link on the confirmation page + emailed to you.",
+                icon: Palette,
+                text: `${product.colorway_variants.length} colorway${product.colorway_variants.length > 1 ? "s" : ""}: ${product.colorway_variants.map((c) => c.name).join(", ")}`,
               },
-              {
-                icon: FileSpreadsheet,
-                title: "Excel & Google Sheets",
-                text: "Use it on any device, including Mac and mobile.",
-              },
-              {
-                icon: Lock,
-                title: "Secure checkout",
-                text: "Visa · Mastercard · Amex · Apple Pay · PayPal.",
-              },
-              {
-                icon: ShieldCheck,
-                title: "We'll make it right",
-                text: "Broken file or wrong item? We fix it or refund it.",
-              },
-            ].map((r) => (
-              <div key={r.title} className="flex items-start gap-3 rounded-xl px-3.5 py-3">
-                <r.icon size={18} className="mt-0.5 shrink-0 text-primary" />
-                <div>
-                  <p className="text-sm font-medium text-foreground">{r.title}</p>
-                  <p className="text-xs text-muted-foreground">{r.text}</p>
-                </div>
+              { icon: BadgeCheck, text: "One-time purchase with lifetime free updates" },
+            ].map((h) => (
+              <div key={h.text} className="flex items-center gap-3 text-sm text-foreground/85">
+                <h.icon size={16} className="shrink-0 text-accent" />
+                {h.text}
               </div>
             ))}
           </div>
 
-          {/* Meet the maker */}
-          <div className="mt-4 flex items-center gap-3 rounded-2xl border border-border/60 bg-secondary/50 p-4">
+          {/* Everything else as calm accordions */}
+          <Accordion
+            type="multiple"
+            defaultValue={["details"]}
+            className="mt-6 border-t border-border"
+          >
+            <AccordionItem value="details">
+              <AccordionTrigger className="text-[15px] font-semibold hover:no-underline">
+                Item details
+              </AccordionTrigger>
+              <AccordionContent className="space-y-5 text-sm leading-relaxed text-muted-foreground">
+                <p className="font-medium text-foreground">{product.description.headline}</p>
+                {product.description.sections.map((s) => (
+                  <div key={s.title}>
+                    <p className="mb-2 font-semibold text-foreground">{s.title}</p>
+                    <ul className="space-y-1.5">
+                      {s.bullets.map((b) => (
+                        <li key={b} className="flex gap-2">
+                          <Check size={15} className="mt-0.5 shrink-0 text-accent" />
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+                {product.perfect_for && (
+                  <div>
+                    <p className="mb-2 font-semibold text-foreground">Perfect for</p>
+                    <ul className="space-y-1.5">
+                      {product.perfect_for.map((p) => (
+                        <li key={p} className="flex gap-2">
+                          <Check size={15} className="mt-0.5 shrink-0 text-accent" />
+                          {p}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="included">
+              <AccordionTrigger className="text-[15px] font-semibold hover:no-underline">
+                What's included
+              </AccordionTrigger>
+              <AccordionContent>
+                <ul className="space-y-1.5 text-sm leading-relaxed text-muted-foreground">
+                  {included.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <Check size={15} className="mt-0.5 shrink-0 text-accent" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="delivery">
+              <AccordionTrigger className="text-[15px] font-semibold hover:no-underline">
+                Delivery &amp; getting started
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 text-sm leading-relaxed text-muted-foreground">
+                <ol className="space-y-1.5">
+                  {howItWorks.map((step, i) => (
+                    <li key={step} className="flex gap-2.5">
+                      <span className="font-semibold text-foreground">{i + 1}.</span>
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+                <div className="space-y-1 border-t border-border pt-3 text-xs">
+                  {product.description.disclaimers.map((d) => (
+                    <p key={d}>{d}</p>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {product.faqs && (
+              <AccordionItem value="faqs">
+                <AccordionTrigger className="text-[15px] font-semibold hover:no-underline">
+                  FAQs
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4">
+                  {product.faqs.map((f) => (
+                    <div key={f.q}>
+                      <p className="text-sm font-semibold text-foreground">{f.q}</p>
+                      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{f.a}</p>
+                    </div>
+                  ))}
+                </AccordionContent>
+              </AccordionItem>
+            )}
+          </Accordion>
+
+          {/* Meet your seller — compact */}
+          <div className="mt-6 flex items-center gap-3 rounded-xl border border-border bg-card p-4">
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary text-base font-semibold text-primary-foreground">
               E
             </span>
             <div className="flex-1">
               <p className="text-sm font-semibold text-foreground">Ledger&amp;Leaf</p>
               <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Store size={12} /> Star shop · Loved by 62,400+ planners
+                <Store size={12} /> 62,400+ sales · <Stars rating={5} size={11} /> 4.9
               </p>
             </div>
             <Link
               to="/about"
               hash="contact"
-              className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium hover:border-primary/40"
+              className="rounded-full border border-border px-3.5 py-1.5 text-xs font-medium hover:border-foreground/40"
             >
               Message
             </Link>
           </div>
+        </div>
 
-          {product.is_bundle && (
-            <div className="mt-8 rounded-2xl bg-card p-5 shadow-soft">
-              <h2 className="font-display text-lg">What's included</h2>
-              <ul className="mt-4 space-y-3">
-                {product.bundle_components.map((id) => {
-                  const c = getProductById(id);
-                  if (!c) return null;
-                  return (
-                    <li key={id} className="flex items-center gap-3">
-                      <img
-                        src={c.images[0]}
-                        alt={c.name}
-                        loading="lazy"
-                        width={48}
-                        height={48}
-                        className="h-12 w-12 rounded-lg object-cover"
-                      />
-                      <div>
-                        <Link
-                          to="/product/$slug"
-                          params={{ slug: c.slug }}
-                          className="text-sm font-medium hover:text-primary"
-                        >
-                          {c.name}
-                        </Link>
-                        <p className="text-xs text-muted-foreground">
-                          Sold separately for {money(c.sale_price)}
-                        </p>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+        {/* ================= RIGHT — compact sticky buy box ================= */}
+        <div className="lg:sticky lg:top-32 lg:self-start">
+          {/* price leads */}
+          <div className="flex flex-wrap items-baseline gap-2.5">
+            <span className="font-display text-[2rem] font-bold leading-none text-foreground">
+              {money(product.sale_price)}
+            </span>
+            {product.sale_price < product.price && (
+              <>
+                <span className="text-base text-muted-foreground line-through">
+                  {money(product.price)}
+                </span>
+                <span className="text-sm font-semibold text-accent">{off}% off</span>
+              </>
+            )}
+          </div>
+
+          {/* modest title */}
+          <h1 className="mt-3 text-[17px] font-medium leading-snug text-foreground">
+            {product.hero_title ?? product.name}
+          </h1>
+
+          {/* seller + rating line */}
+          <a
+            href="#reviews"
+            className="mt-2 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <span className="font-medium text-foreground">Ledger&amp;Leaf</span>
+            <Stars rating={product.rating_avg} size={13} />
+            <span>({product.review_count.toLocaleString()})</span>
+          </a>
+
+          {/* variant dropdown */}
+          {product.colorway_variants.length > 1 && (
+            <div className="mt-5">
+              <p className="mb-1.5 text-sm font-medium text-foreground">Colorway</p>
+              <Select value={colorway} onValueChange={setColorway}>
+                <SelectTrigger className="h-11 w-full rounded-lg border-border bg-card">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {product.colorway_variants.map((c) => (
+                    <SelectItem key={c.name} value={c.name}>
+                      <span className="flex items-center gap-2">
+                        <span
+                          className="h-3.5 w-3.5 rounded-full border border-border"
+                          style={{ backgroundColor: c.hex }}
+                        />
+                        {c.name}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* CTAs */}
+          <div className="mt-5 flex flex-col gap-2.5">
+            <Button
+              size="lg"
+              onClick={() => addToCart()}
+              className="h-12 rounded-full bg-primary text-[15px] font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              Add to cart
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-11 rounded-full border-border text-sm"
+              onClick={() => addToCart("Straight to checkout")}
+            >
+              Buy now
+            </Button>
+          </div>
+
+          {/* slim reassurance rows */}
+          <div className="mt-5 space-y-2 text-sm text-muted-foreground">
+            <p className="flex items-center gap-2">
+              <Download size={15} className="text-accent" /> Instant download — link on the
+              confirmation page &amp; emailed
+            </p>
+            <p className="flex items-center gap-2">
+              <BadgeCheck size={15} className="text-accent" /> One-time purchase · no subscription
+            </p>
+          </div>
+
+          {/* favorite / share — quiet text actions */}
+          <div className="mt-4 flex gap-5 text-sm">
+            <button
+              type="button"
+              onClick={() => {
+                setFav((v) => !v);
+                toast.success(fav ? "Removed from favorites" : "Saved to favorites");
+              }}
+              className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground"
+            >
+              <Heart size={15} className={fav ? "fill-accent text-accent" : ""} />
+              {fav ? "Saved" : "Add to favorites"}
+            </button>
+            <button
+              type="button"
+              onClick={share}
+              className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground"
+            >
+              <Share2 size={15} /> Share
+            </button>
+          </div>
+
+          {/* bundle nudge — slim */}
+          {product.bundle_callout && (
+            <Link
+              to="/product/$slug"
+              params={{ slug: product.bundle_callout.slug }}
+              className="mt-6 flex items-center justify-between gap-3 rounded-xl border border-accent/40 bg-accent/8 px-4 py-3 text-sm transition-colors hover:border-accent"
+            >
+              <span className="font-medium text-foreground">{product.bundle_callout.text}</span>
+              <ArrowRight size={16} className="shrink-0 text-accent" />
+            </Link>
+          )}
+
+          {/* frequently bought together — compact rows */}
+          {alsoBought.length > 0 && (
+            <div className="mt-6 rounded-xl border border-border bg-card p-4">
+              <p className="text-sm font-semibold text-foreground">Frequently bought together</p>
+              <div className="mt-3 space-y-2.5">
+                {alsoBought.map((p) => (
+                  <Link
+                    key={p.id}
+                    to="/product/$slug"
+                    params={{ slug: p.slug }}
+                    className="flex items-center gap-3 rounded-lg p-1.5 transition-colors hover:bg-secondary"
+                  >
+                    <img
+                      src={p.images[0]}
+                      alt=""
+                      width={48}
+                      height={48}
+                      className="h-12 w-12 rounded-lg border border-border object-cover"
+                    />
+                    <span className="flex-1 text-sm leading-snug text-foreground">{p.name}</span>
+                    <span className="text-sm font-semibold text-foreground">
+                      {money(p.sale_price)}
+                    </span>
+                  </Link>
+                ))}
+              </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Description */}
-      <section className="mt-16 grid items-start gap-10 lg:grid-cols-[1.4fr_1fr]">
-        <div className="rounded-2xl border border-border/60 bg-card p-8 shadow-card">
-          <h2 className="font-display text-2xl">{product.description.headline}</h2>
-          {product.description.sections.map((s) => (
-            <div key={s.title} className="mt-6">
-              <h3 className="font-display text-lg text-primary">{s.title}</h3>
-              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                {s.bullets.map((b) => (
-                  <li key={b} className="flex gap-2">
-                    <Check size={16} className="mt-0.5 shrink-0 text-primary" />
-                    {b}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-
-          <div className="mt-8 grid gap-6 sm:grid-cols-2">
-            <div>
-              <h3 className="font-display text-lg text-primary">What you'll receive</h3>
-              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                {product.description.receive.map((r) => (
-                  <li key={r}>· {r}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-display text-lg text-primary">After your purchase</h3>
-              <ol className="mt-3 space-y-2 text-sm text-muted-foreground">
-                {product.description.after.map((a, i) => (
-                  <li key={a}>
-                    {i + 1}. {a}
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
-
-          <Collapsible className="mt-8 border-t border-border pt-4">
-            <CollapsibleTrigger className="flex w-full items-center justify-between text-sm font-medium">
-              Disclaimers &amp; compatibility
-              <ChevronDown size={16} />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="mt-3 space-y-2 text-sm text-muted-foreground">
-              {product.description.disclaimers.map((d) => (
-                <p key={d}>{d}</p>
-              ))}
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-
-        {/* Frequently bought together */}
-        <aside className="h-fit rounded-3xl bg-secondary p-6">
-          <h2 className="font-display text-xl">Frequently bought together</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Add both and take an extra 15% off at checkout.
-          </p>
-          <div className="mt-5 grid gap-4">
-            {alsoBought.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </aside>
-      </section>
-
-      {/* What's included */}
-      {product.whats_included && (
-        <section className="mt-16">
-          <h2 className="font-display text-2xl">What's included</h2>
-          <div className="mt-6 grid gap-x-8 gap-y-3.5 rounded-2xl border border-border/60 bg-card p-8 shadow-card sm:grid-cols-2">
-            {product.whats_included.map((item) => (
-              <div key={item} className="flex gap-3">
-                <Check size={18} className="mt-0.5 shrink-0 text-primary" />
-                <span className="text-sm text-foreground/90">{item}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* How it works */}
-      {product.how_it_works && (
-        <section className="mt-16">
-          <h2 className="font-display text-2xl">How it works</h2>
-          <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {product.how_it_works.map((step, i) => (
-              <li
-                key={step}
-                className="rounded-2xl border border-border/60 bg-card p-5 shadow-card"
-              >
-                <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-                  {i + 1}
-                </span>
-                <p className="mt-3 text-sm leading-relaxed text-foreground/90">{step}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
-
-      {/* Why this version */}
-      {product.why_this && (
-        <section className="mt-16">
-          <h2 className="font-display text-2xl">Why this version</h2>
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-            {product.why_this.map((w) => (
-              <li
-                key={w}
-                className="flex gap-3 rounded-xl border border-border/60 bg-card p-4 shadow-card"
-              >
-                <Sparkles size={17} className="mt-0.5 shrink-0 text-accent" />
-                <span className="text-sm text-foreground/90">{w}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {/* Perfect for */}
-      {product.perfect_for && (
-        <section className="mt-16">
-          <h2 className="font-display text-2xl">Perfect for</h2>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {product.perfect_for.map((p) => (
-              <div key={p} className="flex gap-3 rounded-xl bg-secondary/60 p-4">
-                <Check size={17} className="mt-0.5 shrink-0 text-primary" />
-                <span className="text-sm text-foreground/90">{p}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Bundle callout */}
-      {product.bundle_callout && (
-        <section className="mt-16">
-          <Link
-            to="/product/$slug"
-            params={{ slug: product.bundle_callout.slug }}
-            className="flex flex-col items-start justify-between gap-4 rounded-2xl bg-primary p-7 text-primary-foreground shadow-soft transition-transform hover:-translate-y-0.5 sm:flex-row sm:items-center"
-          >
-            <div className="flex items-center gap-3">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-foreground/15">
-                <Sparkles size={20} />
-              </span>
-              <div>
-                <p className="font-display text-lg text-primary-foreground">
-                  {product.bundle_callout.text}
-                </p>
-                <p className="text-sm text-primary-foreground/80">
-                  Bundle and save versus buying separately.
-                </p>
-              </div>
-            </div>
-            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-accent-foreground">
-              View bundle <ArrowRight size={16} />
-            </span>
-          </Link>
-        </section>
-      )}
-
-      {/* FAQ */}
-      {product.faqs && (
-        <section className="mt-16">
-          <h2 className="font-display text-2xl">Frequently asked questions</h2>
-          <Accordion
-            type="single"
-            collapsible
-            className="mt-6 overflow-hidden rounded-2xl border border-border/60 bg-card px-6 shadow-card"
-          >
-            {product.faqs.map((f, i) => (
-              <AccordionItem key={f.q} value={`faq-${i}`}>
-                <AccordionTrigger className="text-left text-sm font-medium hover:no-underline">
-                  {f.q}
-                </AccordionTrigger>
-                <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
-                  {f.a}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </section>
-      )}
-
-      {/* Reviews */}
-      <section id="reviews" className="mt-16 scroll-mt-24">
+      {/* ================= Reviews ================= */}
+      <section id="reviews" className="mt-16 scroll-mt-24 border-t border-border pt-10">
         <h2 className="font-display text-2xl">Reviews</h2>
         <div className="mt-6 grid gap-8 lg:grid-cols-[280px_1fr]">
-          <div className="h-fit rounded-2xl bg-card p-6 shadow-soft">
+          <div className="h-fit rounded-xl border border-border bg-card p-6">
             <p className="font-display text-4xl">{product.rating_avg}</p>
             <Stars rating={product.rating_avg} size={18} />
             <p className="mt-1 text-xs text-muted-foreground">
@@ -625,7 +519,7 @@ function ProductPage() {
           <div>
             <ul className="space-y-4">
               {shownReviews.map((r) => (
-                <li key={r.id} className="rounded-2xl bg-card p-5 shadow-soft">
+                <li key={r.id} className="rounded-xl border border-border bg-card p-5">
                   <div className="flex items-center justify-between">
                     <p className="font-medium">{r.reviewer_name}</p>
                     <p className="text-xs text-muted-foreground">{r.date}</p>
@@ -657,10 +551,10 @@ function ProductPage() {
         </div>
       </section>
 
-      {/* Related */}
+      {/* ================= Related ================= */}
       <section className="mt-16">
         <h2 className="font-display text-2xl">You may also like</h2>
-        <div className="mt-6 grid grid-cols-2 gap-5 lg:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {related.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
