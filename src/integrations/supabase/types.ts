@@ -14,7 +14,115 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      download_tokens: {
+        Row: {
+          created_at: string
+          download_count: number
+          expires_at: string
+          file_key: string
+          max_downloads: number
+          order_id: string
+          product_slug: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          download_count?: number
+          expires_at: string
+          file_key: string
+          max_downloads?: number
+          order_id: string
+          product_slug: string
+          token?: string
+        }
+        Update: {
+          created_at?: string
+          download_count?: number
+          expires_at?: string
+          file_key?: string
+          max_downloads?: number
+          order_id?: string
+          product_slug?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "download_tokens_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          colorway: string | null
+          id: string
+          order_id: string
+          product_name: string
+          product_slug: string
+          quantity: number
+          unit_amount: number
+        }
+        Insert: {
+          colorway?: string | null
+          id?: string
+          order_id: string
+          product_name: string
+          product_slug: string
+          quantity?: number
+          unit_amount: number
+        }
+        Update: {
+          colorway?: string | null
+          id?: string
+          order_id?: string
+          product_name?: string
+          product_slug?: string
+          quantity?: number
+          unit_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          amount_total: number | null
+          created_at: string
+          currency: string
+          email: string | null
+          id: string
+          status: string
+          stripe_session_id: string
+        }
+        Insert: {
+          amount_total?: number | null
+          created_at?: string
+          currency?: string
+          email?: string | null
+          id?: string
+          status?: string
+          stripe_session_id: string
+        }
+        Update: {
+          amount_total?: number | null
+          created_at?: string
+          currency?: string
+          email?: string | null
+          id?: string
+          status?: string
+          stripe_session_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
