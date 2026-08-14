@@ -122,33 +122,40 @@ export function Header() {
 
         {/* Category nav row (desktop) */}
         <nav className="hidden border-t border-border/60 md:block">
-          <div className="container-page flex h-11 items-center gap-7 text-sm">
-            {NAV.map((n) => (
+          <div className="container-page grid h-11 grid-cols-[1fr_auto_1fr] items-center text-sm">
+            <span aria-hidden />
+            <div className="flex items-center justify-center gap-7">
+              {NAV.map((n) => (
+                <Link
+                  key={n.slug}
+                  to={n.to}
+                  params={{ slug: n.slug }}
+                  className="text-foreground/75 transition-colors hover:text-primary"
+                  activeProps={{ className: "text-primary font-medium" }}
+                >
+                  {n.label}
+                </Link>
+              ))}
               <Link
-                key={n.slug}
-                to={n.to}
-                params={{ slug: n.slug }}
+                to="/plr"
                 className="text-foreground/75 transition-colors hover:text-primary"
                 activeProps={{ className: "text-primary font-medium" }}
               >
-                {n.label}
+                PLR
               </Link>
-            ))}
+              <Link
+                to="/blog"
+                className="text-foreground/75 transition-colors hover:text-primary"
+                activeProps={{ className: "text-primary font-medium" }}
+              >
+                Blog
+              </Link>
+            </div>
             <Link
-              to="/plr"
-              className="text-foreground/75 transition-colors hover:text-primary"
-              activeProps={{ className: "text-primary font-medium" }}
+              to="/collections/$slug"
+              params={{ slug: "freebies" }}
+              className="justify-self-end"
             >
-              PLR
-            </Link>
-            <Link
-              to="/blog"
-              className="text-foreground/75 transition-colors hover:text-primary"
-              activeProps={{ className: "text-primary font-medium" }}
-            >
-              Blog
-            </Link>
-            <Link to="/collections/$slug" params={{ slug: "freebies" }} className="ml-auto">
               <span className="rounded-full bg-accent/12 px-3 py-1 font-semibold text-accent">
                 Free templates →
               </span>
