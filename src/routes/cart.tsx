@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Trash2 } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
+import { startCheckout } from "@/lib/checkout";
 import { money } from "@/data/shop";
 
 export const Route = createFileRoute("/cart")({
@@ -27,7 +27,10 @@ function CartPage() {
       {detailed.length === 0 ? (
         <div className="mt-10 rounded-2xl bg-card p-10 text-center shadow-soft">
           <p className="text-muted-foreground">Your cart is empty.</p>
-          <Button asChild className="mt-6 rounded-full bg-accent text-accent-foreground hover:bg-accent/90">
+          <Button
+            asChild
+            className="mt-6 rounded-full bg-accent text-accent-foreground hover:bg-accent/90"
+          >
             <Link to="/collections/$slug" params={{ slug: "best-sellers" }}>
               Browse best sellers
             </Link>
@@ -63,7 +66,9 @@ function CartPage() {
                       type="number"
                       min={1}
                       value={line.qty}
-                      onChange={(e) => setQty(line.productId, line.colorway, Number(e.target.value))}
+                      onChange={(e) =>
+                        setQty(line.productId, line.colorway, Number(e.target.value))
+                      }
                       className="h-9 w-16 rounded-lg border border-input bg-background px-2 text-sm"
                       aria-label="Quantity"
                     />
@@ -79,7 +84,10 @@ function CartPage() {
               </li>
             ))}
             <li>
-              <button onClick={clear} className="text-xs text-muted-foreground hover:text-destructive">
+              <button
+                onClick={clear}
+                className="text-xs text-muted-foreground hover:text-destructive"
+              >
                 Clear cart
               </button>
             </li>
@@ -102,9 +110,13 @@ function CartPage() {
             <Button
               className="mt-6 h-12 w-full rounded-full bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
               onClick={() =>
-                toast("Checkout isn't connected yet", {
-                  description: "Say the word and I'll wire up Stripe payments and digital delivery.",
-                })
+                startCheckout(
+                  detailed.map(({ line, product }) => ({
+                    slug: product.slug,
+                    colorway: line.colorway,
+                    qty: line.qty,
+                  })),
+                )
               }
             >
               Checkout securely

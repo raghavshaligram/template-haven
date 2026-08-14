@@ -1,0 +1,16 @@
+project_id = "template-haven"
+
+# Public endpoints (no Supabase auth JWT required).
+# create-checkout and get-order are called from the storefront;
+# stripe-webhook is called by Stripe; download is opened from emails.
+[functions.create-checkout]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.download]
+verify_jwt = false
+
+[functions.get-order]
+verify_jwt = false
