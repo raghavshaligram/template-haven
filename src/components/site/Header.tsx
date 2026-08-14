@@ -85,7 +85,7 @@ export function Header() {
                         alt=""
                         width={44}
                         height={44}
-                        className="product-media h-11 w-11 rounded-lg object-cover"
+                        className="h-11 w-11 rounded-lg object-cover"
                       />
                       <span className="flex-1 text-sm">{p.name}</span>
                       <span className="text-sm font-semibold text-foreground">
@@ -142,7 +142,7 @@ export function Header() {
               PLR
             </Link>
             <Link to="/collections/$slug" params={{ slug: "freebies" }} className="ml-auto">
-              <span className="rounded-full bg-accent/20 px-3 py-1 font-medium text-primary">
+              <span className="rounded-full bg-accent/12 px-3 py-1 font-semibold text-accent">
                 Free templates →
               </span>
             </Link>
@@ -192,7 +192,7 @@ export function Header() {
                     alt=""
                     width={40}
                     height={40}
-                    className="product-media h-10 w-10 rounded object-cover"
+                    className="h-10 w-10 rounded object-cover"
                   />
                   <span className="text-sm">{p.name}</span>
                 </Link>

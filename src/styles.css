@@ -19,7 +19,7 @@
  */
 
 @theme inline {
-  --font-serif: "Fraunces", ui-serif, Georgia, serif;
+  --font-serif: "Sora", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -71,31 +71,31 @@
 }
 
 :root {
-  --radius: 0.75rem;
-  /* cream #F7F5F0 */
-  --background: oklch(0.968 0.008 90);
-  /* charcoal #2B2B2B */
-  --foreground: oklch(0.285 0 0);
-  --card: oklch(0.995 0.004 90);
-  --card-foreground: oklch(0.285 0 0);
-  --popover: oklch(0.995 0.004 90);
-  --popover-foreground: oklch(0.285 0 0);
-  /* deep sage #2D5F4F */
-  --primary: oklch(0.415 0.062 163);
-  --primary-foreground: oklch(0.975 0.01 90);
-  --primary-soft: oklch(0.9 0.03 163);
-  --secondary: oklch(0.935 0.014 90);
-  --secondary-foreground: oklch(0.34 0.03 163);
-  --muted: oklch(0.938 0.01 90);
-  --muted-foreground: oklch(0.52 0.012 90);
-  /* warm amber — a touch richer for CTAs & badges */
-  --accent: oklch(0.762 0.138 71);
-  --accent-foreground: oklch(0.27 0.045 68);
-  --destructive: oklch(0.55 0.19 27);
-  --destructive-foreground: oklch(0.98 0.005 90);
-  --border: oklch(0.9 0.012 90);
-  --input: oklch(0.9 0.012 90);
-  --ring: oklch(0.415 0.062 163);
+  --radius: 0.625rem;
+  /* near-white, faintly cool */
+  --background: oklch(0.992 0.001 260);
+  /* ink near-black */
+  --foreground: oklch(0.22 0.012 265);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.012 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.012 265);
+  /* ink — primary buttons, wordmark, announcement bar */
+  --primary: oklch(0.24 0.014 265);
+  --primary-foreground: oklch(0.99 0 0);
+  --primary-soft: oklch(0.955 0.006 260);
+  --secondary: oklch(0.968 0.003 260);
+  --secondary-foreground: oklch(0.28 0.012 265);
+  --muted: oklch(0.968 0.003 260);
+  --muted-foreground: oklch(0.505 0.014 265);
+  /* emerald money-accent — prices, CTAs, badges */
+  --accent: oklch(0.63 0.15 157);
+  --accent-foreground: oklch(0.99 0 0);
+  --destructive: oklch(0.58 0.2 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.925 0.004 265);
+  --input: oklch(0.925 0.004 265);
+  --ring: oklch(0.63 0.15 157);
   --chart-1: oklch(0.415 0.062 163);
   --chart-2: oklch(0.783 0.121 76);
   --chart-3: oklch(0.6 0.05 163);
@@ -166,7 +166,8 @@
   .font-display {
     font-family: var(--font-serif);
     font-optical-sizing: auto;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.03em;
+    font-weight: 600;
   }
 }
 

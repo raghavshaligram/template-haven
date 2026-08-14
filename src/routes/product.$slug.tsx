@@ -152,7 +152,7 @@ function ProductPage() {
                   loading="lazy"
                   width={80}
                   height={80}
-                  className="product-media h-full w-full object-cover"
+                  className="h-full w-full object-cover"
                 />
               </button>
             ))}
@@ -180,9 +180,8 @@ function ProductPage() {
                 alt={`${product.name} preview ${img + 1}`}
                 width={1024}
                 height={1024}
-                className="product-media aspect-square w-full object-cover"
+                className="aspect-square w-full object-cover"
               />
-              <span className="product-wash" aria-hidden />
               {product.best_seller && (
                 <span className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary-foreground shadow-sm">
                   Bestseller
@@ -211,12 +210,12 @@ function ProductPage() {
                 <BadgeCheck size={13} /> Bestseller
               </span>
             )}
-            <span className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2.5 py-1 text-[11px] font-semibold text-accent-foreground">
+            <span className="inline-flex items-center gap-1 rounded-full bg-accent/12 px-2.5 py-1 text-[11px] font-semibold text-accent">
               <Sparkles size={12} className="text-accent" /> Star shop
             </span>
             <span className="text-[11px] text-muted-foreground">Loved by 62,400+ planners</span>
           </div>
-          <h1 className="font-display text-3xl leading-tight md:text-[2.5rem]">
+          <h1 className="font-display text-2xl leading-tight md:text-[1.85rem]">
             {product.hero_title ?? product.name}
           </h1>
           {product.hero_subtitle && (

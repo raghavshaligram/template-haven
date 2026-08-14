@@ -23,7 +23,7 @@ export function ProductCard({ product }: { product: Product }) {
           loading="lazy"
           width={1024}
           height={1024}
-          className="product-media h-full w-full object-cover transition-all duration-500 group-hover:scale-[1.04] group-hover:opacity-0"
+          className="h-full w-full object-cover transition-all duration-500 group-hover:scale-[1.03] group-hover:opacity-0"
         />
         <img
           src={hover}
@@ -32,11 +32,8 @@ export function ProductCard({ product }: { product: Product }) {
           loading="lazy"
           width={1024}
           height={1024}
-          className="product-media absolute inset-0 h-full w-full scale-105 object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         />
-        {/* unifying wash so every product photo reads as one cohesive set */}
-        <span className="product-wash" aria-hidden />
-
         {/* badges */}
         <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5">
           {product.best_seller && (
@@ -91,7 +88,7 @@ export function ProductCard({ product }: { product: Product }) {
                 {money(product.price)}
               </span>
               {off > 0 && (
-                <span className="text-[11px] font-semibold text-primary">Save {off}%</span>
+                <span className="text-[11px] font-semibold text-accent">Save {off}%</span>
               )}
             </>
           )}

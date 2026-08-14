@@ -1,9 +1,15 @@
-import budgetImg from "@/assets/product-budget.jpg";
-import debtImg from "@/assets/product-debt.jpg";
-import billsImg from "@/assets/product-bills.jpg";
-import bundleImg from "@/assets/product-bundle.jpg";
-import freebieImg from "@/assets/product-freebie.jpg";
-import businessImg from "@/assets/product-business.jpg";
+import budgetImg from "@/assets/art-budget.svg";
+import budgetDark from "@/assets/art-budget-dark.svg";
+import debtImg from "@/assets/art-debt.svg";
+import debtDark from "@/assets/art-debt-dark.svg";
+import billsImg from "@/assets/art-bills.svg";
+import billsDark from "@/assets/art-bills-dark.svg";
+import bundleImg from "@/assets/art-bundle.svg";
+import bundleDark from "@/assets/art-bundle-dark.svg";
+import freebieImg from "@/assets/art-freebie.svg";
+import freebieDark from "@/assets/art-freebie-dark.svg";
+import businessImg from "@/assets/art-business.svg";
+import businessDark from "@/assets/art-business-dark.svg";
 
 export type Colorway = { name: string; hex: string };
 
@@ -282,7 +288,7 @@ export const products: Product[] = [
     sale_price: 10.5,
     category: "personal-finance",
     colorway_variants: [LIGHT, DARK, SAGE],
-    images: [budgetImg, bundleImg, businessImg],
+    images: [budgetImg, budgetDark],
     download_url: "https://example.com/downloads/smart-budget",
     rating_avg: 4.9,
     review_count: 1284,
@@ -303,7 +309,7 @@ export const products: Product[] = [
     sale_price: 9,
     category: "personal-finance",
     colorway_variants: [LIGHT, SAGE],
-    images: [debtImg, budgetImg],
+    images: [debtImg, debtDark],
     download_url: "https://example.com/downloads/debt-payoff",
     rating_avg: 4.8,
     review_count: 742,
@@ -324,7 +330,7 @@ export const products: Product[] = [
     sale_price: 8,
     category: "personal-finance",
     colorway_variants: [LIGHT, DARK],
-    images: [billsImg, budgetImg],
+    images: [billsImg, billsDark],
     download_url: "https://example.com/downloads/bill-calendar",
     rating_avg: 4.7,
     review_count: 508,
@@ -345,7 +351,7 @@ export const products: Product[] = [
     sale_price: 27.5,
     category: "bundles",
     colorway_variants: [LIGHT, DARK, SAGE],
-    images: [bundleImg, budgetImg, debtImg, billsImg],
+    images: [bundleImg, bundleDark],
     download_url: "https://example.com/downloads/money-bundle",
     rating_avg: 5,
     review_count: 419,
@@ -366,7 +372,7 @@ export const products: Product[] = [
     sale_price: 14.5,
     category: "business-tools",
     colorway_variants: [LIGHT, SAGE],
-    images: [businessImg, bundleImg],
+    images: [businessImg, businessDark],
     download_url: "https://example.com/downloads/profit-sheet",
     rating_avg: 4.8,
     review_count: 233,
@@ -387,7 +393,7 @@ export const products: Product[] = [
     sale_price: 7,
     category: "organization",
     colorway_variants: [LIGHT, DARK, SAGE],
-    images: [billsImg, businessImg],
+    images: [billsImg, billsDark],
     download_url: "https://example.com/downloads/weekly-planner",
     rating_avg: 4.6,
     review_count: 187,
@@ -408,7 +414,7 @@ export const products: Product[] = [
     sale_price: 0,
     category: "freebies",
     colorway_variants: [LIGHT],
-    images: [freebieImg],
+    images: [freebieImg, freebieDark],
     download_url: "https://example.com/downloads/free-tracker",
     rating_avg: 4.9,
     review_count: 3120,
@@ -465,7 +471,7 @@ export const products: Product[] = [
     sale_price: 198.5,
     category: "plr",
     colorway_variants: [LIGHT, DARK, SAGE],
-    images: [bundleImg, businessImg, budgetImg],
+    images: [bundleImg, bundleDark],
     download_url: "https://example.com/downloads/plr-vault",
     rating_avg: 4.9,
     review_count: 96,
