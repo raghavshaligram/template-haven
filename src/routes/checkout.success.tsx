@@ -8,7 +8,7 @@ import { useCart } from "@/lib/cart";
 
 export const Route = createFileRoute("/checkout/success")({
   validateSearch: (search: Record<string, unknown>) => ({
-    session_id: typeof search["session_id"] === "string" ? (search["session_id"] as string) : "",
+    order_id: typeof search["order_id"] === "string" ? (search["order_id"] as string) : "",
   }),
   head: () => ({
     meta: [{ title: "Order complete — Ledger&Leaf" }, { name: "robots", content: "noindex" }],
@@ -19,13 +19,13 @@ export const Route = createFileRoute("/checkout/success")({
 type OrderData = NonNullable<Awaited<ReturnType<typeof fetchOrder>>>;
 
 function SuccessPage() {
-  const { session_id } = useSearch({ from: "/checkout/success" });
+  const { order_id } = useSearch({ from: "/checkout/success" });
   const { clear } = useCart();
   const [order, setOrder] = useState<OrderData | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
 
   useEffect(() => {
-    if (!session_id) {
+    if (!order_id) {
       setState("error");
       return;
     }
@@ -34,14 +34,16 @@ function SuccessPage() {
     let cancelled = false;
     const poll = async () => {
       try {
-        const data = await fetchOrder(session_id);
+        const data = await fetchOrder(order_id);
         if (cancelled) return;
         if (data) {
           setOrder(data);
           setState("ready");
           return;
         }
-        // webhook not landed yet — retry up to ~30s
+        // capture-order already fulfills the order synchronously in the
+        // common case — this retry only matters if paypal-webhook ends up
+        // being the one to land fulfillment instead. Retry up to ~30s.
         if (attempts++ < 15) setTimeout(poll, 2000);
         else setState("error");
       } catch {
@@ -53,7 +55,7 @@ function SuccessPage() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session_id]);
+  }, [order_id]);
 
   return (
     <div className="container-page flex min-h-[60vh] items-center justify-center py-16">

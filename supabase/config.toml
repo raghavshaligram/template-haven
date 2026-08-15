@@ -1,1 +1,25 @@
-project_id = "lhspcwrlaqlbojggrisg"
+project_id = "template-haven"
+
+# Public endpoints (no Supabase auth JWT required).
+# paypal-config, paypal-create-order, paypal-capture-order, and get-order
+# are called from the storefront; paypal-webhook is called by PayPal's
+# servers, which cannot supply a Supabase JWT at all — it verifies
+# PayPal's own signature instead (see that function's comment); download
+# is opened from emails.
+[functions.paypal-config]
+verify_jwt = false
+
+[functions.paypal-create-order]
+verify_jwt = false
+
+[functions.paypal-capture-order]
+verify_jwt = false
+
+[functions.paypal-webhook]
+verify_jwt = false
+
+[functions.download]
+verify_jwt = false
+
+[functions.get-order]
+verify_jwt = false

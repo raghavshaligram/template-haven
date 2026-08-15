@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
-import { startCheckout } from "@/lib/checkout";
 import { money } from "@/data/shop";
 
 export const Route = createFileRoute("/cart")({
@@ -108,18 +107,10 @@ function CartPage() {
               <span className="text-primary">{money(subtotal)}</span>
             </div>
             <Button
+              asChild
               className="mt-6 h-12 w-full rounded-full bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
-              onClick={() =>
-                startCheckout(
-                  detailed.map(({ line, product }) => ({
-                    slug: product.slug,
-                    colorway: line.colorway,
-                    qty: line.qty,
-                  })),
-                )
-              }
             >
-              Checkout securely
+              <Link to="/checkout">Checkout securely</Link>
             </Button>
             <p className="mt-3 text-center text-xs text-muted-foreground">
               Instant digital download — no physical item shipped.
