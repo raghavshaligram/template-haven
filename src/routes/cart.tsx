@@ -17,7 +17,7 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const { detailed, subtotal, setQty, remove, clear } = useCart();
+  const { detailed, subtotal, setQty, remove, clear, openCart } = useCart();
 
   return (
     <div className="container-page py-12">
@@ -107,10 +107,10 @@ function CartPage() {
               <span className="text-primary">{money(subtotal)}</span>
             </div>
             <Button
-              asChild
               className="mt-6 h-12 w-full rounded-full bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
+              onClick={openCart}
             >
-              <Link to="/checkout">Checkout securely</Link>
+              Checkout securely
             </Button>
             <p className="mt-3 text-center text-xs text-muted-foreground">
               Instant digital download — no physical item shipped.

@@ -12,6 +12,23 @@ type CartCtx = {
   count: number;
   subtotal: number;
   detailed: { line: CartLine; product: Product }[];
+
+  // Cart drawer — the one-step checkout UI that slides out on "Add to
+  // cart"/"Buy now" instead of navigating to a separate page.
+  drawerOpen: boolean;
+  /** Opens the drawer showing the persisted cart. */
+  openCart: () => void;
+  closeCart: () => void;
+  /** Opens the drawer for a single-item direct purchase, bypassing (and
+   *  not modifying) the persisted cart — the drawer's "Buy now" mode. */
+  buyNow: (productId: string, colorway: string) => void;
+  /** True while the drawer is showing a buyNow() override rather than the
+   *  persisted cart — the drawer uses this to hide qty/remove controls,
+   *  since a direct buy is a single fixed line. */
+  isBuyNow: boolean;
+  /** What the drawer's checkout button should actually purchase: the
+   *  buyNow() override line if set, otherwise the full persisted cart. */
+  checkoutDetailed: { line: CartLine; product: Product }[];
 };
 
 const CartContext = createContext<CartCtx | null>(null);
@@ -19,6 +36,8 @@ const KEY = "ledgerleaf-cart";
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [buyNowLine, setBuyNowLine] = useState<CartLine | null>(null);
 
   useEffect(() => {
     try {
@@ -41,6 +60,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const detailed = lines
       .map((line) => ({ line, product: getProductById(line.productId) }))
       .filter((x): x is { line: CartLine; product: Product } => Boolean(x.product));
+
+    const buyNowProduct = buyNowLine ? getProductById(buyNowLine.productId) : undefined;
+    const isBuyNow = Boolean(buyNowLine && buyNowProduct);
+    const checkoutDetailed =
+      buyNowLine && buyNowProduct ? [{ line: buyNowLine, product: buyNowProduct }] : detailed;
 
     return {
       lines,
@@ -67,8 +91,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
           ),
         ),
       clear: () => setLines([]),
+
+      drawerOpen,
+      isBuyNow,
+      checkoutDetailed,
+      openCart: () => {
+        setBuyNowLine(null);
+        setDrawerOpen(true);
+      },
+      closeCart: () => {
+        setDrawerOpen(false);
+        setBuyNowLine(null);
+      },
+      buyNow: (productId, colorway) => {
+        setBuyNowLine({ productId, colorway, qty: 1 });
+        setDrawerOpen(true);
+      },
     };
-  }, [lines]);
+  }, [lines, drawerOpen, buyNowLine]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

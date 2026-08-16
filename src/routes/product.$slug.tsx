@@ -70,7 +70,7 @@ export const Route = createFileRoute("/product/$slug")({
 function ProductPage() {
   const { slug } = Route.useParams();
   const product = getProduct(slug)!;
-  const { add } = useCart();
+  const { add, openCart, buyNow } = useCart();
 
   const [img, setImg] = useState(0);
   const [colorway, setColorway] = useState(product.colorway_variants[0]!.name);
@@ -110,9 +110,12 @@ function ProductPage() {
     reviewPage * REVIEWS_PER_PAGE,
   );
 
-  function addToCart(message = "Added to your cart") {
+  function addToCart() {
     add(product.id, colorway);
-    toast.success(message, { description: `${product.name} — ${colorway}` });
+    // Slide the cart open right away instead of a toast + a separate click
+    // to check out — the drawer itself is the confirmation, and it's a
+    // one-step checkout (PayPal button included) from here.
+    openCart();
   }
 
   return (
@@ -408,14 +411,12 @@ function ProductPage() {
               Add to cart
             </Button>
             <Button
-              asChild
               size="lg"
               variant="outline"
               className="h-11 rounded-full border-border text-sm"
+              onClick={() => buyNow(product.id, colorway)}
             >
-              <Link to="/checkout" search={{ buy: product.slug, colorway }}>
-                Buy now
-              </Link>
+              Buy now
             </Button>
           </div>
 
