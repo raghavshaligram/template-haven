@@ -100,8 +100,9 @@ export type Database = {
           currency: string
           email: string | null
           id: string
+          provider: string
+          provider_order_id: string
           status: string
-          stripe_session_id: string
         }
         Insert: {
           amount_total?: number | null
@@ -109,8 +110,9 @@ export type Database = {
           currency?: string
           email?: string | null
           id?: string
+          provider?: string
+          provider_order_id: string
           status?: string
-          stripe_session_id: string
         }
         Update: {
           amount_total?: number | null
@@ -118,8 +120,9 @@ export type Database = {
           currency?: string
           email?: string | null
           id?: string
+          provider?: string
+          provider_order_id?: string
           status?: string
-          stripe_session_id?: string
         }
         Relationships: []
       }
