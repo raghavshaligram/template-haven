@@ -4,8 +4,11 @@ The repo contains a complete self-owned fulfillment system (your own
 "Lemon Squeezy"): PayPal Checkout → order recorded → expiring download
 tokens → buyer emailed links → files served from private storage. Same
 PayPal Orders API v2 pattern used on balanceextract.com, adapted for guest
-checkout (no accounts here — anyone with a cart can pay, same trust model
-Stripe had).
+checkout — anyone with a cart can pay without an account, same trust model
+Stripe had. Accounts are optional on top of that: a buyer can sign in
+(email/password or Google) before or during checkout to get order history
+and re-download access at `/account`; if they don't, they check out exactly
+as before and get their files by email link only.
 
 Everything is code. One-time setup below (~20 minutes), then every new
 product only needs its ZIP uploaded and one catalog entry.
@@ -62,18 +65,35 @@ the email; the other becomes a no-op on the same order.
      `Ledger&Leaf <orders@yourdomain.com>`. Until then emails send from
      the Resend sandbox address.
 
-4. **Upload product files**: Lovable Cloud → Storage → `product-files`
+4. **Accounts** (optional — checkout works without doing this, but the
+   "Sign in" prompts in the cart drawer and `/account` won't until you do):
+   - Email/password is on by default in every Supabase project — nothing
+     to configure. If you'd rather buyers confirm their email before their
+     first sign-in counts, toggle it under Authentication → Sign In /
+     Providers → Email → "Confirm email".
+   - **Google**: in [Google Cloud Console](https://console.cloud.google.com/apis/credentials),
+     create an OAuth 2.0 Client ID (type: Web application). Add
+     `https://<your-project-ref>.supabase.co/auth/v1/callback` as an
+     authorized redirect URI. Copy the Client ID and Secret into Lovable
+     Cloud → Authentication → Providers → Google, and toggle it on.
+   - **Site URL**: Authentication → URL Configuration → set Site URL to
+     your real domain, and add it (and any preview domains) under
+     Redirect URLs — Google sign-in and email confirmation links both
+     bounce through this.
+
+5. **Upload product files**: Lovable Cloud → Storage → `product-files`
    bucket → upload each ZIP named exactly as its `fileKey` in
    `supabase/functions/_shared/catalog.ts` (e.g.
    `smart-budget-spreadsheet.zip`).
 
-5. **Test in PayPal Sandbox**: developer.paypal.com → Sandbox → Accounts
-   gives you a test buyer login (email + password). Go through `/checkout`
+6. **Test in PayPal Sandbox**: developer.paypal.com → Sandbox → Accounts
+   gives you a test buyer login (email + password). Go through checkout
    on your deployed site and pay with that sandbox buyer. Confirm: success
    page shows downloads, email arrives, link downloads the ZIP, and the
-   order row appears in the `orders` table.
+   order row appears in the `orders` table. If you signed in first, also
+   confirm the order shows up at `/account`.
 
-6. **Go live**: create a Live app in the same PayPal dashboard, add
+7. **Go live**: create a Live app in the same PayPal dashboard, add
    `PAYPAL_CLIENT_ID_LIVE`, `PAYPAL_CLIENT_SECRET_LIVE`, register a second
    webhook pointed at the same URL for the live app and add
    `PAYPAL_WEBHOOK_ID_LIVE`, then flip `PAYPAL_ENV` to `live`.

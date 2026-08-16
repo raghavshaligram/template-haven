@@ -23,3 +23,9 @@ verify_jwt = false
 
 [functions.get-order]
 verify_jwt = false
+
+# get-my-orders backs the /account order history page and requires a
+# signed-in caller — unlike everything else above, which guest checkout
+# depends on being reachable with no session at all.
+[functions.get-my-orders]
+verify_jwt = true

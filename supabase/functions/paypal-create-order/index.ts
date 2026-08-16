@@ -17,6 +17,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { CATALOG } from "../_shared/catalog.ts";
 import { getAccessToken, paypalApiBase } from "../_shared/paypal.ts";
 import { json, preflight } from "../_shared/http.ts";
+import { getUserIdFromRequest } from "../_shared/auth.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL") ?? "",
@@ -35,6 +36,14 @@ Deno.serve(async (req) => {
     if (!Array.isArray(items) || items.length === 0) {
       return json({ error: "Cart is empty" }, 400);
     }
+
+    // Accounts are optional (see the accounts migration) -- checkout never
+    // requires a session. If the buyer happens to be signed in, this
+    // resolves to their user id and the order gets linked to their
+    // account for order history/re-download; if not (no header, expired
+    // token, whatever), it's null and the order stays exactly as guest
+    // checkout has always worked.
+    const userId = await getUserIdFromRequest(req);
 
     let amountCents = 0;
     const orderItems: {
@@ -117,6 +126,7 @@ Deno.serve(async (req) => {
         amount_total: amountCents,
         currency: "usd",
         status: "pending",
+        user_id: userId,
       })
       .select("id")
       .single();

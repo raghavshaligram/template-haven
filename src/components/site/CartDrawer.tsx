@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Minus, Plus, ShieldCheck, Trash2 } from "lucide-react";
+import { Minus, Plus, ShieldCheck, Trash2, UserCircle2 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
 import { money } from "@/data/shop";
 import { PayPalCheckoutButton } from "@/components/site/PayPalCheckoutButton";
 import type { CheckoutItem } from "@/lib/checkout";
@@ -14,6 +15,7 @@ import type { CheckoutItem } from "@/lib/checkout";
  */
 export function CartDrawer() {
   const { drawerOpen, closeCart, checkoutDetailed, isBuyNow, setQty, remove } = useCart();
+  const { user, loading: authLoading, openAuthModal, signOut } = useAuth();
 
   const items: CheckoutItem[] = checkoutDetailed.map(({ line, product }) => ({
     slug: product.slug,
@@ -100,6 +102,36 @@ export function CartDrawer() {
               <p className="mt-1 text-xs text-muted-foreground">
                 Instant digital download — no physical item shipped.
               </p>
+
+              {!authLoading && (
+                <div className="mt-3 flex items-center justify-between gap-2 rounded-lg bg-secondary/60 px-3 py-2 text-xs">
+                  {user ? (
+                    <>
+                      <span className="flex items-center gap-1.5 text-foreground">
+                        <UserCircle2 size={14} className="text-accent" /> Signed in as {user.email}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => void signOut()}
+                        className="shrink-0 font-medium text-muted-foreground hover:text-foreground"
+                      >
+                        Sign out
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-muted-foreground">Checking out as guest.</span>
+                      <button
+                        type="button"
+                        onClick={() => openAuthModal("sign-up")}
+                        className="shrink-0 font-medium text-primary hover:text-primary/80"
+                      >
+                        Sign in to save this order
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
 
               <div className="mt-1">
                 <PayPalCheckoutButton items={items} onApproved={closeCart} />

@@ -1,16 +1,27 @@
+import { supabase } from "@/integrations/supabase/client";
+
 export type CheckoutItem = { slug: string; colorway?: string; qty?: number };
 
 function functionsBase(): string | undefined {
   return import.meta.env["VITE_SUPABASE_URL"] as string | undefined;
 }
 
-/** Creates a PayPal order for the given cart and returns its PayPal order id. */
+/** Attaches the signed-in buyer's bearer token when there is a session —
+ *  omitted entirely for guests, who check out exactly as before. */
+async function authHeader(): Promise<Record<string, string>> {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+/** Creates a PayPal order for the given cart and returns its PayPal order id.
+ *  Links the order to the caller's account if they're signed in. */
 export async function createPaypalOrder(items: CheckoutItem[]): Promise<string> {
   const base = functionsBase();
   if (!base) throw new Error("Checkout isn't configured yet");
   const res = await fetch(`${base}/functions/v1/paypal-create-order`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(await authHeader()) },
     body: JSON.stringify({ items }),
   });
   const data = (await res.json()) as { orderId?: string; error?: string };
@@ -53,4 +64,33 @@ export async function fetchOrder(orderId: string) {
     }[];
     downloads: { productSlug: string; url: string; expiresAt: string }[];
   };
+}
+
+export type MyOrder = {
+  orderId: string;
+  amountTotal: number | null;
+  currency: string;
+  status: string;
+  createdAt: string;
+  items: {
+    productSlug: string;
+    productName: string;
+    colorway: string | null;
+    unitAmount: number;
+    quantity: number;
+  }[];
+  downloads: { productSlug: string; url: string; expiresAt: string }[];
+};
+
+/** Order history + re-download links for the signed-in buyer's /account
+ *  page. Requires a session — throws if there isn't one. */
+export async function fetchMyOrders(): Promise<MyOrder[]> {
+  const base = functionsBase();
+  if (!base) throw new Error("Not configured yet");
+  const headers = await authHeader();
+  if (!headers["Authorization"]) throw new Error("Not signed in");
+  const res = await fetch(`${base}/functions/v1/get-my-orders`, { headers });
+  if (!res.ok) throw new Error("Could not load your orders");
+  const data = (await res.json()) as { orders: MyOrder[] };
+  return data.orders;
 }

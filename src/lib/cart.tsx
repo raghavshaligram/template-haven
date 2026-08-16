@@ -33,6 +33,13 @@ type CartCtx = {
 
 const CartContext = createContext<CartCtx | null>(null);
 const KEY = "ledgerleaf-cart";
+// sessionStorage (not localStorage) — a "Buy now" is meant to be
+// throwaway once the tab closes, unlike the persisted cart. This only
+// exists so it survives the *same-tab* full-page reload that Google's
+// OAuth redirect causes: someone hits Buy now, decides to sign in first
+// from the drawer, and should land back in the same checkout rather than
+// having their single-item purchase silently vanish.
+const BUY_NOW_KEY = "ledgerleaf-buy-now";
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
@@ -46,6 +53,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch {
       /* ignore */
     }
+    try {
+      const raw = sessionStorage.getItem(BUY_NOW_KEY);
+      if (raw) {
+        setBuyNowLine(JSON.parse(raw));
+        setDrawerOpen(true);
+      }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   useEffect(() => {
@@ -55,6 +71,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
       /* ignore */
     }
   }, [lines]);
+
+  useEffect(() => {
+    try {
+      if (buyNowLine) sessionStorage.setItem(BUY_NOW_KEY, JSON.stringify(buyNowLine));
+      else sessionStorage.removeItem(BUY_NOW_KEY);
+    } catch {
+      /* ignore */
+    }
+  }, [buyNowLine]);
 
   const value = useMemo<CartCtx>(() => {
     const detailed = lines
