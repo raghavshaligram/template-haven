@@ -23,7 +23,7 @@ function searchProducts(q: string) {
 }
 
 export function Header() {
-  const { count } = useCart();
+  const { count, openCart } = useCart();
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -106,14 +106,19 @@ export function Header() {
             <button aria-label="Search" className="md:hidden" onClick={() => setSearchOpen(true)}>
               <Search size={20} className="text-foreground/80 hover:text-primary" />
             </button>
-            <Link to="/cart" aria-label="Cart" className="relative">
+            <button
+              type="button"
+              onClick={openCart}
+              aria-label="Cart"
+              className="relative cursor-pointer"
+            >
               <ShoppingBag size={20} className="text-foreground/80 hover:text-primary" />
               {count > 0 && (
                 <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-accent-foreground">
                   {count}
                 </span>
               )}
-            </Link>
+            </button>
             <Link to="/account" aria-label="Account" className="hidden sm:block">
               <User size={20} className="text-foreground/80 hover:text-primary" />
             </Link>

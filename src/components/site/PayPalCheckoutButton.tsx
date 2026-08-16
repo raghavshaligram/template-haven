@@ -3,6 +3,14 @@ import { useNavigate } from "@tanstack/react-router";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import { capturePaypalOrder, createPaypalOrder, type CheckoutItem } from "@/lib/checkout";
 
+type Props = {
+  items: CheckoutItem[];
+  /** Called right after a successful capture, before navigating to the
+   *  success page — lets the cart drawer close itself instead of sitting
+   *  open behind the new route. */
+  onApproved?: () => void;
+};
+
 declare global {
   interface Window {
     paypal?: {
@@ -26,11 +34,26 @@ type Status = "loading" | "ready" | "unavailable" | "processing" | "error";
  * also mints download tokens and sends the order email — by the time this
  * component navigates to /checkout/success, fulfillment has already run.
  */
-export function PayPalCheckoutButton({ items }: { items: CheckoutItem[] }) {
+export function PayPalCheckoutButton({ items, onApproved }: Props) {
   const [status, setStatus] = useState<Status>("loading");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  // The PayPal SDK's Buttons instance is only created once (see the empty
+  // dependency array below) — reading items/onApproved through refs, kept
+  // fresh every render, means createOrder always sends whatever the cart
+  // actually holds at click time even if it changed after the buttons
+  // first rendered (e.g. the drawer's qty controls edited a line while it
+  // was open), without needing to re-render PayPal's own button UI.
+  const itemsRef = useRef(items);
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
+  const onApprovedRef = useRef(onApproved);
+  useEffect(() => {
+    onApprovedRef.current = onApproved;
+  }, [onApproved]);
 
   useEffect(() => {
     let cancelled = false;
@@ -108,7 +131,7 @@ export function PayPalCheckoutButton({ items }: { items: CheckoutItem[] }) {
           style: { layout: "vertical", color: "gold", shape: "rect", label: "pay" },
           async createOrder() {
             try {
-              return await createPaypalOrder(items);
+              return await createPaypalOrder(itemsRef.current);
             } catch (err) {
               const message = err instanceof Error ? err.message : "Could not start checkout.";
               setErrorMessage(message);
@@ -135,6 +158,7 @@ export function PayPalCheckoutButton({ items }: { items: CheckoutItem[] }) {
               setStatus("error");
               return;
             }
+            onApprovedRef.current?.();
             navigate({ to: "/checkout/success", search: { order_id: data.orderID } });
           },
           onCancel() {
