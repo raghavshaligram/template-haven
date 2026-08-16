@@ -15,8 +15,10 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartDrawer } from "@/components/site/CartDrawer";
 import { QuickViewModal } from "@/components/site/QuickViewModal";
+import { AuthModal } from "@/components/site/AuthModal";
 import { CartProvider } from "@/lib/cart";
 import { QuickViewProvider } from "@/lib/quick-view";
+import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -135,21 +137,24 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <QuickViewProvider>
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">
-              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-              <Outlet />
-            </main>
-            <Footer />
-          </div>
-          <CartDrawer />
-          <QuickViewModal />
-          <Toaster position="top-center" />
-        </QuickViewProvider>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <QuickViewProvider>
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">
+                {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+                <Outlet />
+              </main>
+              <Footer />
+            </div>
+            <CartDrawer />
+            <QuickViewModal />
+            <AuthModal />
+            <Toaster position="top-center" />
+          </QuickViewProvider>
+        </CartProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
