@@ -1,6 +1,8 @@
-// GET ?session_id=cs_... — order summary + download links for the success page.
-// Retries make this safe to call immediately after redirect, since the
-// webhook may land a second or two after the buyer does.
+// GET ?order_id=<PayPal order id> — order summary + download links for the
+// success page. Retries make this safe to call immediately after the
+// buyer approves, since in the rare case fulfillment happens via
+// paypal-webhook rather than the browser's own capture call, it may land
+// a second or two later.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { json, preflight } from "../_shared/http.ts";
 
@@ -13,13 +15,13 @@ Deno.serve(async (req) => {
   const pf = preflight(req);
   if (pf) return pf;
 
-  const sessionId = new URL(req.url).searchParams.get("session_id");
-  if (!sessionId || !sessionId.startsWith("cs_")) return json({ error: "Bad session id" }, 400);
+  const orderId = new URL(req.url).searchParams.get("order_id");
+  if (!orderId) return json({ error: "Bad order id" }, 400);
 
   const { data: order } = await supabase
     .from("orders")
     .select("id, email, amount_total, currency, status, created_at")
-    .eq("stripe_session_id", sessionId)
+    .eq("provider_order_id", orderId)
     .maybeSingle();
 
   if (!order) return json({ pending: true }, 202);

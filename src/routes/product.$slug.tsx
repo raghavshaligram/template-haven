@@ -30,7 +30,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCart } from "@/lib/cart";
-import { startCheckout } from "@/lib/checkout";
 import {
   discountPct,
   getCategory,
@@ -409,12 +408,14 @@ function ProductPage() {
               Add to cart
             </Button>
             <Button
+              asChild
               size="lg"
               variant="outline"
               className="h-11 rounded-full border-border text-sm"
-              onClick={() => startCheckout([{ slug: product.slug, colorway }])}
             >
-              Buy now
+              <Link to="/checkout" search={{ buy: product.slug, colorway }}>
+                Buy now
+              </Link>
             </Button>
           </div>
 

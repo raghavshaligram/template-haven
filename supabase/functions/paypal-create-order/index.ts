@@ -1,0 +1,141 @@
+// POST { items: [{ slug, colorway?, qty? }] } -> { orderId }
+//
+// Creates a PayPal Order (Orders API v2, one-time payment) for the cart,
+// then immediately writes it to our own orders/order_items tables as
+// 'pending'. That's the guest-checkout equivalent of the custom_id-based
+// ownership check balanceextract.com uses (see that repo's
+// paypal-create-order/paypal-capture-order comments): Ledger&Leaf has no
+// accounts, so instead of "does this order belong to the calling user",
+// paypal-capture-order and paypal-webhook only ever fulfill an order that
+// genuinely exists here as 'pending' — an id that was never created
+// through this function can't be capture-fulfilled.
+//
+// Prices come only from CATALOG (never the client) — same rule
+// create-checkout followed for Stripe. A tampered request body naming a
+// lower price has no effect; the amount charged is computed here.
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { CATALOG } from "../_shared/catalog.ts";
+import { getAccessToken, paypalApiBase } from "../_shared/paypal.ts";
+import { json, preflight } from "../_shared/http.ts";
+
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL") ?? "",
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+);
+
+type CartItem = { slug: string; colorway?: string; qty?: number };
+
+Deno.serve(async (req) => {
+  const pf = preflight(req);
+  if (pf) return pf;
+  if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+
+  try {
+    const { items } = (await req.json()) as { items: CartItem[] };
+    if (!Array.isArray(items) || items.length === 0) {
+      return json({ error: "Cart is empty" }, 400);
+    }
+
+    let amountCents = 0;
+    const orderItems: {
+      product_slug: string;
+      product_name: string;
+      colorway: string;
+      unit_amount: number;
+      quantity: number;
+    }[] = [];
+    const nameParts: string[] = [];
+
+    for (const it of items) {
+      const cat = CATALOG[it.slug];
+      if (!cat) return json({ error: `Unknown product: ${it.slug}` }, 400);
+      const qty = Math.min(Math.max(Math.trunc(it.qty ?? 1), 1), 10);
+      const colorway = (it.colorway ?? "Light").slice(0, 40);
+      amountCents += cat.priceCents * qty;
+      orderItems.push({
+        product_slug: it.slug,
+        product_name: cat.name,
+        colorway,
+        unit_amount: cat.priceCents,
+        quantity: qty,
+      });
+      nameParts.push(cat.name);
+    }
+
+    // All-free carts skip checkout entirely (handled client-side via the
+    // free download link) — same rule create-checkout followed.
+    if (amountCents === 0) {
+      return json({ error: "Free items don't need checkout — use the free download link." }, 400);
+    }
+
+    const accessToken = await getAccessToken();
+    const amountUsd = (amountCents / 100).toFixed(2);
+    const orderRes = await fetch(`${paypalApiBase()}/v2/checkout/orders`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        intent: "CAPTURE",
+        purchase_units: [
+          {
+            description: `Ledger&Leaf — ${nameParts.join(", ")}`.slice(0, 127),
+            amount: { currency_code: "USD", value: amountUsd },
+          },
+        ],
+        // Digital product, nothing to ship — without this PayPal's default
+        // is to prompt for a shipping address AND a phone number on the
+        // review/card page, neither of which this checkout has any use
+        // for. Both live under payment_source.paypal in the current
+        // Orders v2 API.
+        payment_source: {
+          paypal: {
+            experience_context: {
+              shipping_preference: "NO_SHIPPING",
+              contact_preference: "NO_CONTACT_INFO",
+            },
+          },
+        },
+      }),
+    });
+
+    if (!orderRes.ok) {
+      const body = await orderRes.text();
+      console.error("PayPal create-order failed:", orderRes.status, body);
+      return json({ error: "Could not start checkout" }, 502);
+    }
+
+    const order = await orderRes.json();
+    const orderId: string = order.id;
+
+    const { data: orderRow, error: orderErr } = await supabase
+      .from("orders")
+      .insert({
+        provider: "paypal",
+        provider_order_id: orderId,
+        amount_total: amountCents,
+        currency: "usd",
+        status: "pending",
+      })
+      .select("id")
+      .single();
+    if (orderErr || !orderRow) {
+      console.error("Failed to record pending order:", orderErr);
+      return json({ error: "Could not start checkout" }, 500);
+    }
+
+    const { error: itemsErr } = await supabase
+      .from("order_items")
+      .insert(orderItems.map((it) => ({ ...it, order_id: orderRow.id })));
+    if (itemsErr) {
+      console.error("Failed to record order items:", itemsErr);
+      return json({ error: "Could not start checkout" }, 500);
+    }
+
+    return json({ orderId });
+  } catch (e) {
+    console.error("paypal-create-order error:", e);
+    return json({ error: "Could not start checkout" }, 500);
+  }
+});

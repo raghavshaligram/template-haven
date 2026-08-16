@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as PlrRouteImport } from './routes/plr'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
@@ -41,6 +42,11 @@ const CartRoute = CartRouteImport.update({
   path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
@@ -62,9 +68,9 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
-  id: '/checkout/success',
-  path: '/checkout/success',
-  getParentRoute: () => rootRouteImport,
+  id: '/success',
+  path: '/success',
+  getParentRoute: () => CheckoutRoute,
 } as any)
 const CollectionsSlugRoute = CollectionsSlugRouteImport.update({
   id: '/collections/$slug',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRouteWithChildren
   '/faq': typeof FaqRoute
   '/plr': typeof PlrRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRouteWithChildren
   '/faq': typeof FaqRoute
   '/plr': typeof PlrRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRouteWithChildren
   '/faq': typeof FaqRoute
   '/plr': typeof PlrRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/cart'
+    | '/checkout'
     | '/faq'
     | '/plr'
     | '/blog/$slug'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/cart'
+    | '/checkout'
     | '/faq'
     | '/plr'
     | '/blog/$slug'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/cart'
+    | '/checkout'
     | '/faq'
     | '/plr'
     | '/blog/$slug'
@@ -164,10 +176,10 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
   CartRoute: typeof CartRoute
+  CheckoutRoute: typeof CheckoutRouteWithChildren
   FaqRoute: typeof FaqRoute
   PlrRoute: typeof PlrRoute
   BlogSlugRoute: typeof BlogSlugRoute
-  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -203,6 +215,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/faq': {
       id: '/faq'
       path: '/faq'
@@ -233,10 +252,10 @@ declare module '@tanstack/react-router' {
     }
     '/checkout/success': {
       id: '/checkout/success'
-      path: '/checkout/success'
+      path: '/success'
       fullPath: '/checkout/success'
       preLoaderRoute: typeof CheckoutSuccessRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof CheckoutRoute
     }
     '/collections/$slug': {
       id: '/collections/$slug'
@@ -255,15 +274,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface CheckoutRouteChildren {
+  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
+}
+
+const CheckoutRouteChildren: CheckoutRouteChildren = {
+  CheckoutSuccessRoute: CheckoutSuccessRoute,
+}
+
+const CheckoutRouteWithChildren = CheckoutRoute._addFileChildren(
+  CheckoutRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
   CartRoute: CartRoute,
+  CheckoutRoute: CheckoutRouteWithChildren,
   FaqRoute: FaqRoute,
   PlrRoute: PlrRoute,
   BlogSlugRoute: BlogSlugRoute,
-  CheckoutSuccessRoute: CheckoutSuccessRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,
   ProductSlugRoute: ProductSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
