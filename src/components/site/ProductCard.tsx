@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Heart } from "lucide-react";
+import { Eye, Heart } from "lucide-react";
 import { Stars } from "./Stars";
 import { discountPct, money, type Product } from "@/data/shop";
 import { cn } from "@/lib/utils";
+import { useQuickView } from "@/lib/quick-view";
 
 export function ProductCard({ product }: { product: Product }) {
   const hover = product.images[1] ?? product.images[0];
   const off = discountPct(product);
   const [saved, setSaved] = useState(false);
+  const { open: openQuickView } = useQuickView();
 
   return (
     <Link
@@ -66,6 +68,19 @@ export function ProductCard({ product }: { product: Product }) {
           className="absolute right-2.5 top-2.5 grid h-8 w-8 place-items-center rounded-full bg-background/85 text-foreground/70 opacity-0 shadow-sm backdrop-blur transition-all duration-200 hover:text-primary group-hover:opacity-100 focus-visible:opacity-100"
         >
           <Heart size={16} className={cn(saved && "fill-accent text-accent")} />
+        </button>
+
+        {/* quick view — slides up from the bottom on hover */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openQuickView(product);
+          }}
+          className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-center gap-1.5 bg-background/90 py-2.5 text-xs font-semibold text-foreground backdrop-blur transition-transform duration-200 ease-out hover:bg-background group-hover:translate-y-0 focus-visible:translate-y-0"
+        >
+          <Eye size={14} /> Quick view
         </button>
       </div>
 
