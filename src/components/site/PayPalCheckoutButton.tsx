@@ -14,7 +14,7 @@ type Props = {
 declare global {
   interface Window {
     paypal?: {
-      Buttons: (options: Record<string, unknown>) => { render: (selector: string) => void };
+      Buttons: (options: Record<string, unknown>) => { render: (container: HTMLElement) => void };
     };
   }
 }
@@ -38,6 +38,10 @@ export function PayPalCheckoutButton({ items, onApproved }: Props) {
   const [status, setStatus] = useState<Status>("loading");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  // Guards against ever calling .render() twice into this instance's own
+  // container (belt-and-suspenders alongside rendering into the element
+  // itself rather than a selector — see renderPayPalButtons below).
+  const renderedRef = useRef(false);
   const navigate = useNavigate();
 
   // The PayPal SDK's Buttons instance is only created once (see the empty
@@ -125,6 +129,8 @@ export function PayPalCheckoutButton({ items, onApproved }: Props) {
         setStatus("error");
         return;
       }
+      if (renderedRef.current) return;
+      renderedRef.current = true;
       setStatus("ready");
       window.paypal
         .Buttons({
@@ -169,7 +175,13 @@ export function PayPalCheckoutButton({ items, onApproved }: Props) {
             setStatus("error");
           },
         })
-        .render(`#${containerRef.current.id}`);
+        // Render into the element itself, not a selector string — a
+        // selector like "#paypal-checkout-button-container" would resolve
+        // to whichever matching element comes first in the document,
+        // which silently doubles up the buttons if more than one
+        // PayPalCheckoutButton instance is ever mounted at once (e.g. the
+        // cart drawer left open behind a direct checkout page visit).
+        .render(containerRef.current);
     }
 
     init();
@@ -206,7 +218,7 @@ export function PayPalCheckoutButton({ items, onApproved }: Props) {
           {errorMessage}
         </div>
       )}
-      <div id="paypal-checkout-button-container" ref={containerRef} />
+      <div ref={containerRef} />
     </div>
   );
 }
