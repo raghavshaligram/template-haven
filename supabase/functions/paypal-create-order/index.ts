@@ -93,24 +93,20 @@ Deno.serve(async (req) => {
             amount: { currency_code: "USD", value: amountUsd },
           },
         ],
-        // Digital product, nothing to ship — without this PayPal's default
-        // is to prompt for a shipping address AND a phone number on the
-        // review/card page, neither of which this checkout has any use
-        // for. Both live under payment_source.paypal in the current
-        // Orders v2 API.
+        // Digital product, nothing to ship. Set this ONCE, at order level via
+        // application_context: it is funding-source-agnostic, so it covers both
+        // the PayPal-wallet flow and the "Debit or Credit Card" guest flow.
         //
-        // Do NOT also send a top-level application_context.shipping_preference:
-        // PayPal rejects the order with 422 INCOMPATIBLE_PARAMETER_VALUE when
-        // both the deprecated application_context and experience_context carry
-        // shipping_preference. experience_context is the supported field.
-        payment_source: {
-          paypal: {
-            experience_context: {
-              shipping_preference: "NO_SHIPPING",
-              contact_preference: "NO_CONTACT_INFO",
-            },
-          },
+        // Do NOT also send payment_source.paypal.experience_context.shipping_preference:
+        // PayPal rejects orders carrying shipping_preference in both places with
+        // 422 INCOMPATIBLE_PARAMETER_VALUE. And payment_source.paypal alone doesn't
+        // bind to the card path, which is how the guest card form ends up asking
+        // for a shipping address after payment details.
+        application_context: {
+          shipping_preference: "NO_SHIPPING",
+          user_action: "PAY_NOW",
         },
+
 
       }),
     });
