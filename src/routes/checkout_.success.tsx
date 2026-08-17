@@ -6,7 +6,7 @@ import { fetchOrder } from "@/lib/checkout";
 import { getProduct, money } from "@/data/shop";
 import { useCart } from "@/lib/cart";
 
-export const Route = createFileRoute("/checkout/success")({
+export const Route = createFileRoute("/checkout_/success")({
   validateSearch: (search: Record<string, unknown>) => ({
     order_id: typeof search["order_id"] === "string" ? (search["order_id"] as string) : "",
   }),
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/checkout/success")({
 type OrderData = NonNullable<Awaited<ReturnType<typeof fetchOrder>>>;
 
 function SuccessPage() {
-  const { order_id } = useSearch({ from: "/checkout/success" });
+  const { order_id } = useSearch({ from: "/checkout_/success" });
   const { clear } = useCart();
   const [order, setOrder] = useState<OrderData | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");

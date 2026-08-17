@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartDrawer } from "@/components/site/CartDrawer";
+import { PayPalRedirectReturn } from "@/components/site/PayPalRedirectReturn";
 import { QuickViewModal } from "@/components/site/QuickViewModal";
 import { AuthModal } from "@/components/site/AuthModal";
 import { CartProvider } from "@/lib/cart";
@@ -151,6 +152,7 @@ function RootComponent() {
             <CartDrawer />
             <QuickViewModal />
             <AuthModal />
+            <PayPalRedirectReturn />
             <Toaster position="top-center" />
           </QuickViewProvider>
         </CartProvider>

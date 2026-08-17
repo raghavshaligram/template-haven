@@ -82,6 +82,59 @@ Deno.serve(async (req) => {
     const resource = event.resource ?? {};
     const orderId: string | undefined = resource.supplementary_data?.related_ids?.order_id;
 
+    if (eventType === "CHECKOUT.ORDER.APPROVED") {
+      // The buyer approved on PayPal but nothing has captured yet. In the
+      // normal popup flow the browser's onApprove does the capture within
+      // seconds and this event needs no action. But if the flow ran as a
+      // full-page redirect and the return leg never completed (tab
+      // closed, network dropped, old frontend without the redirect
+      // handler), this event is the ONLY signal the sale exists — so
+      // capture it server-side. Racing the browser is safe: whichever
+      // capture lands second gets ORDER_ALREADY_CAPTURED and backs off,
+      // and fulfillOrder is idempotent underneath both.
+      const approvedOrderId: string | undefined = resource.id;
+      if (!approvedOrderId) {
+        return new Response("Acknowledged, no identifying id", { status: 200 });
+      }
+      const { data: orderRow } = await supabase
+        .from("orders")
+        .select("id, status")
+        .eq("provider_order_id", approvedOrderId)
+        .maybeSingle();
+      if (!orderRow) return new Response("Acknowledged, unknown order", { status: 200 });
+      if (orderRow.status !== "pending") return new Response("OK", { status: 200 });
+
+      const captureRes = await fetch(
+        `${paypalApiBase()}/v2/checkout/orders/${approvedOrderId}/capture`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      if (!captureRes.ok) {
+        const body = await captureRes.text();
+        if (body.includes("ORDER_ALREADY_CAPTURED")) {
+          // The browser (or a webhook retry) beat us to it — the
+          // PAYMENT.CAPTURE.COMPLETED event handles fulfillment.
+          return new Response("OK", { status: 200 });
+        }
+        // Non-2xx tells PayPal to retry this event later — a transient
+        // PayPal API error shouldn't permanently lose the sale.
+        console.error("webhook capture of approved order failed:", captureRes.status, body);
+        return new Response("Capture failed, retry", { status: 500 });
+      }
+      const captured = await captureRes.json();
+      const captureStatus: string | undefined =
+        captured.purchase_units?.[0]?.payments?.captures?.[0]?.status;
+      if (captureStatus === "COMPLETED") {
+        await fulfillOrder(supabase, orderRow.id, captured.payer?.email_address ?? null);
+      }
+      return new Response("OK", { status: 200 });
+    }
+
     if (eventType === "PAYMENT.CAPTURE.COMPLETED") {
       if (!orderId) {
         console.error("PAYMENT.CAPTURE.COMPLETED with no order_id; nothing to match against.");

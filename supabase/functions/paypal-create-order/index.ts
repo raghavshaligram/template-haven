@@ -45,6 +45,13 @@ Deno.serve(async (req) => {
     // checkout has always worked.
     const userId = await getUserIdFromRequest(req);
 
+    // Where PayPal should send the buyer back if the flow runs as a
+    // full-page redirect rather than a popup (see application_context
+    // below). The browser sends Origin on this cross-origin POST; if it's
+    // ever absent the URLs are simply omitted and PayPal falls back to
+    // its default behavior.
+    const origin = req.headers.get("origin");
+
     let amountCents = 0;
     const orderItems: {
       product_slug: string;
@@ -102,12 +109,19 @@ Deno.serve(async (req) => {
         // 422 INCOMPATIBLE_PARAMETER_VALUE. And payment_source.paypal alone doesn't
         // bind to the card path, which is how the guest card form ends up asking
         // for a shipping address after payment details.
+        //
+        // return_url/cancel_url: only used when PayPal downgrades from its
+        // popup to a full-page redirect (popups blocked, some 3-D Secure
+        // challenges, the hosted guest-card flow). PayPal sends the buyer
+        // back to return_url with ?token=<orderId>&PayerID=… appended;
+        // the storefront's PayPalRedirectReturn component picks those up
+        // and completes the capture. Without an explicit return leg, a
+        // redirect-flow approval just strands the buyer.
         application_context: {
           shipping_preference: "NO_SHIPPING",
           user_action: "PAY_NOW",
+          ...(origin ? { return_url: `${origin}/`, cancel_url: `${origin}/` } : {}),
         },
-
-
       }),
     });
 

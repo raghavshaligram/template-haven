@@ -55,9 +55,14 @@ the email; the other becomes a no-op on the same order.
      `PAYPAL_CLIENT_SECRET_SANDBOX`.
    - Sandbox → Apps & Credentials → your app → **Webhooks** → Add webhook:
      `https://<your-project-ref>.supabase.co/functions/v1/paypal-webhook`,
-     subscribed to `PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.DENIED`,
-     `PAYMENT.CAPTURE.REFUNDED`, `PAYMENT.CAPTURE.REVERSED`. Copy the
-     **Webhook ID** → add secret `PAYPAL_WEBHOOK_ID_SANDBOX`.
+     subscribed to `CHECKOUT.ORDER.APPROVED`, `PAYMENT.CAPTURE.COMPLETED`,
+     `PAYMENT.CAPTURE.DENIED`, `PAYMENT.CAPTURE.REFUNDED`,
+     `PAYMENT.CAPTURE.REVERSED`. Copy the **Webhook ID** → add secret
+     `PAYPAL_WEBHOOK_ID_SANDBOX`.
+     (`CHECKOUT.ORDER.APPROVED` matters: it's the server-side safety net
+     that captures a sale whose browser return leg never completed —
+     e.g. PayPal ran as a full-page redirect and the buyer closed the
+     tab. Without it that approval would just never become a payment.)
 
 3. **Resend** (resend.com, free tier is plenty to start):
    - Add secret `RESEND_API_KEY`.
