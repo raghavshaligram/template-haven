@@ -60,6 +60,17 @@ Deno.serve(async (req) => {
       return json({ error: "Order not found" }, 404);
     }
 
+    if (orderRow.status !== "pending") {
+      // Already resolved — either this endpoint already captured it (a
+      // retry after a slow/lost response, a double-click before the
+      // button UI disables, etc.) or the webhook beat us to it. Calling
+      // PayPal's capture API again here would get rejected
+      // (ORDER_ALREADY_CAPTURED) and read as a scary "something went
+      // wrong" to a buyer whose payment actually went through the first
+      // time. Report the outcome we already know instead.
+      return json({ status: orderRow.status === "paid" ? "COMPLETED" : orderRow.status });
+    }
+
     const accessToken = await getAccessToken();
     const captureRes = await fetch(`${paypalApiBase()}/v2/checkout/orders/${orderId}/capture`, {
       method: "POST",

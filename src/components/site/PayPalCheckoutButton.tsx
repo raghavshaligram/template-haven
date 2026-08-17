@@ -42,6 +42,12 @@ export function PayPalCheckoutButton({ items, onApproved }: Props) {
   // container (belt-and-suspenders alongside rendering into the element
   // itself rather than a selector — see renderPayPalButtons below).
   const renderedRef = useRef(false);
+  // Guards against onApprove running twice concurrently for the same
+  // approval (a stray double-click on PayPal's own iframe before our
+  // "processing" state has a chance to visually block it, a slow network
+  // response the buyer retries, etc.) — without this, a second capture
+  // call for an order that's already mid-capture races the first one.
+  const capturingRef = useRef(false);
   const navigate = useNavigate();
 
   // The PayPal SDK's Buttons instance is only created once (see the empty
@@ -146,6 +152,8 @@ export function PayPalCheckoutButton({ items, onApproved }: Props) {
             }
           },
           async onApprove(data: { orderID: string }) {
+            if (capturingRef.current) return;
+            capturingRef.current = true;
             setStatus("processing");
             try {
               const completed = await capturePaypalOrder(data.orderID);
@@ -163,6 +171,8 @@ export function PayPalCheckoutButton({ items, onApproved }: Props) {
               );
               setStatus("error");
               return;
+            } finally {
+              capturingRef.current = false;
             }
             onApprovedRef.current?.();
             navigate({ to: "/checkout/success", search: { order_id: data.orderID } });
@@ -218,7 +228,14 @@ export function PayPalCheckoutButton({ items, onApproved }: Props) {
           {errorMessage}
         </div>
       )}
-      <div ref={containerRef} />
+      {/* Dimmed and inert while a capture is in flight — PayPal's iframe
+          buttons render here and stay clickable by default; without this,
+          an impatient buyer can click "Pay" again mid-capture and race a
+          second capture attempt against the first. */}
+      <div
+        ref={containerRef}
+        className={status === "processing" ? "pointer-events-none opacity-40" : undefined}
+      />
     </div>
   );
 }
