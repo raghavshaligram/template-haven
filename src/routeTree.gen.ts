@@ -18,7 +18,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as PlrRouteImport } from './routes/plr'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
-import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
+import { Route as CheckoutSuccessRouteImport } from './routes/checkout_.success'
 import { Route as CollectionsSlugRouteImport } from './routes/collections.$slug'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 
@@ -68,9 +68,9 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
-  id: '/success',
-  path: '/success',
-  getParentRoute: () => CheckoutRoute,
+  id: '/checkout_/success',
+  path: '/checkout/success',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CollectionsSlugRoute = CollectionsSlugRouteImport.update({
   id: '/collections/$slug',
@@ -88,7 +88,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/cart': typeof CartRoute
-  '/checkout': typeof CheckoutRouteWithChildren
+  '/checkout': typeof CheckoutRoute
   '/faq': typeof FaqRoute
   '/plr': typeof PlrRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -102,7 +102,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/cart': typeof CartRoute
-  '/checkout': typeof CheckoutRouteWithChildren
+  '/checkout': typeof CheckoutRoute
   '/faq': typeof FaqRoute
   '/plr': typeof PlrRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -117,11 +117,11 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/cart': typeof CartRoute
-  '/checkout': typeof CheckoutRouteWithChildren
+  '/checkout': typeof CheckoutRoute
   '/faq': typeof FaqRoute
   '/plr': typeof PlrRoute
   '/blog/$slug': typeof BlogSlugRoute
-  '/checkout/success': typeof CheckoutSuccessRoute
+  '/checkout_/success': typeof CheckoutSuccessRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/product/$slug': typeof ProductSlugRoute
   '/blog/': typeof BlogIndexRoute
@@ -165,7 +165,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/plr'
     | '/blog/$slug'
-    | '/checkout/success'
+    | '/checkout_/success'
     | '/collections/$slug'
     | '/product/$slug'
     | '/blog/'
@@ -176,10 +176,11 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
   CartRoute: typeof CartRoute
-  CheckoutRoute: typeof CheckoutRouteWithChildren
+  CheckoutRoute: typeof CheckoutRoute
   FaqRoute: typeof FaqRoute
   PlrRoute: typeof PlrRoute
   BlogSlugRoute: typeof BlogSlugRoute
+  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -250,12 +251,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/checkout/success': {
-      id: '/checkout/success'
-      path: '/success'
+    '/checkout_/success': {
+      id: '/checkout_/success'
+      path: '/checkout/success'
       fullPath: '/checkout/success'
       preLoaderRoute: typeof CheckoutSuccessRouteImport
-      parentRoute: typeof CheckoutRoute
+      parentRoute: typeof rootRouteImport
     }
     '/collections/$slug': {
       id: '/collections/$slug'
@@ -274,27 +275,16 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface CheckoutRouteChildren {
-  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
-}
-
-const CheckoutRouteChildren: CheckoutRouteChildren = {
-  CheckoutSuccessRoute: CheckoutSuccessRoute,
-}
-
-const CheckoutRouteWithChildren = CheckoutRoute._addFileChildren(
-  CheckoutRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
   CartRoute: CartRoute,
-  CheckoutRoute: CheckoutRouteWithChildren,
+  CheckoutRoute: CheckoutRoute,
   FaqRoute: FaqRoute,
   PlrRoute: PlrRoute,
   BlogSlugRoute: BlogSlugRoute,
+  CheckoutSuccessRoute: CheckoutSuccessRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,
   ProductSlugRoute: ProductSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
