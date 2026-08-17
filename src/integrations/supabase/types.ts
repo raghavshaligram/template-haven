@@ -103,6 +103,7 @@ export type Database = {
           provider: string
           provider_order_id: string
           status: string
+          user_id: string | null
         }
         Insert: {
           amount_total?: number | null
@@ -113,6 +114,7 @@ export type Database = {
           provider?: string
           provider_order_id: string
           status?: string
+          user_id?: string | null
         }
         Update: {
           amount_total?: number | null
@@ -123,6 +125,7 @@ export type Database = {
           provider?: string
           provider_order_id?: string
           status?: string
+          user_id?: string | null
         }
         Relationships: []
       }

@@ -98,6 +98,11 @@ Deno.serve(async (req) => {
         // review/card page, neither of which this checkout has any use
         // for. Both live under payment_source.paypal in the current
         // Orders v2 API.
+        //
+        // Do NOT also send a top-level application_context.shipping_preference:
+        // PayPal rejects the order with 422 INCOMPATIBLE_PARAMETER_VALUE when
+        // both the deprecated application_context and experience_context carry
+        // shipping_preference. experience_context is the supported field.
         payment_source: {
           paypal: {
             experience_context: {
@@ -106,19 +111,7 @@ Deno.serve(async (req) => {
             },
           },
         },
-        // …but payment_source.paypal.experience_context only binds to the
-        // PayPal-wallet flow. When a buyer takes the "Debit or Credit
-        // Card" (guest card) path instead, the payment source is card,
-        // that context never applies, and PayPal falls back to its
-        // default of pushing a second hosted page to collect a shipping
-        // address after the card form — which reads as a duplicated
-        // checkout for a digital product. application_context is the
-        // order-level, funding-source-agnostic equivalent and covers the
-        // card path; where both are present, experience_context takes
-        // precedence for the wallet flow, so they don't conflict.
-        application_context: {
-          shipping_preference: "NO_SHIPPING",
-        },
+
       }),
     });
 
