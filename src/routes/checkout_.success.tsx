@@ -90,9 +90,11 @@ function SuccessPage() {
         {state === "ready" && order && (
           <div>
             <div className="text-center">
-              <CheckCircle2 size={40} className="mx-auto text-accent" />
-              <h1 className="mt-4 font-display text-3xl">You're all set</h1>
-              <p className="mt-2 text-sm text-muted-foreground">
+              <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-accent/10 ring-8 ring-accent/5">
+                <CheckCircle2 size={32} className="text-accent" />
+              </span>
+              <h1 className="mt-5 font-display text-3xl">You're all set</h1>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
                 {order.email ? (
                   <>
                     A copy of these links was emailed to{" "}
@@ -105,49 +107,61 @@ function SuccessPage() {
               </p>
             </div>
 
-            <div className="mt-8 space-y-3">
-              {order.downloads.map((d) => {
-                const prod = getProduct(d.productSlug);
-                const item = order.items.find((i) => i.product_slug === d.productSlug);
-                return (
-                  <div
-                    key={d.url}
-                    className="flex items-center gap-4 rounded-xl border border-border bg-card p-4"
-                  >
-                    {prod && (
-                      <img
-                        src={prod.images[0]}
-                        alt=""
-                        width={56}
-                        height={56}
-                        className="h-14 w-14 rounded-lg border border-border object-cover"
-                      />
-                    )}
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground">
-                        {item?.product_name ?? d.productSlug}
-                      </p>
-                      {item?.colorway && (
-                        <p className="text-xs text-muted-foreground">Colorway: {item.colorway}</p>
-                      )}
-                    </div>
-                    <Button
-                      asChild
-                      className="rounded-full bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
+            <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
+              <div className="flex items-center justify-between border-b border-border bg-secondary/40 px-5 py-3.5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Your files
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Total paid{" "}
+                  <span className="font-semibold text-foreground">
+                    {money((order.amountTotal ?? 0) / 100)}
+                  </span>
+                </p>
+              </div>
+              <div className="divide-y divide-border">
+                {order.downloads.map((d) => {
+                  const prod = getProduct(d.productSlug);
+                  const item = order.items.find((i) => i.product_slug === d.productSlug);
+                  return (
+                    <div
+                      key={d.url}
+                      className="flex items-center gap-4 p-4 transition-colors hover:bg-secondary/30 sm:px-5"
                     >
-                      <a href={d.url}>
-                        <Download size={15} /> Download
-                      </a>
-                    </Button>
-                  </div>
-                );
-              })}
+                      {prod && (
+                        <img
+                          src={prod.images[0]}
+                          alt=""
+                          width={56}
+                          height={56}
+                          className="h-14 w-14 rounded-lg border border-border object-cover"
+                        />
+                      )}
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-foreground">
+                          {item?.product_name ?? d.productSlug}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {item?.colorway ? `${item.colorway} · ` : ""}Excel + Google Sheets
+                        </p>
+                      </div>
+                      <Button
+                        asChild
+                        className="rounded-full bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
+                      >
+                        <a href={d.url}>
+                          <Download size={15} /> Download
+                        </a>
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="border-t border-border bg-secondary/40 px-5 py-3 text-center text-xs text-muted-foreground">
+                Open the DEMO file first — it shows everything working before you touch your BLANK
+                copy.
+              </p>
             </div>
-
-            <p className="mt-6 text-center text-xs text-muted-foreground">
-              Total paid: {money((order.amountTotal ?? 0) / 100)} · Open the DEMO file first — it
-              shows everything working before you touch your BLANK copy.
-            </p>
 
             {/* Strictly below the downloads, and only for guests — someone
                 already signed in has an account and a library already.
