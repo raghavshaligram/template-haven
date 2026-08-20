@@ -17,9 +17,11 @@ import { CartDrawer } from "@/components/site/CartDrawer";
 import { PayPalRedirectReturn } from "@/components/site/PayPalRedirectReturn";
 import { QuickViewModal } from "@/components/site/QuickViewModal";
 import { AuthModal } from "@/components/site/AuthModal";
+import { CookieBanner } from "@/components/site/CookieBanner";
 import { CartProvider } from "@/lib/cart";
 import { QuickViewProvider } from "@/lib/quick-view";
 import { AuthProvider } from "@/lib/auth";
+import { ConsentProvider } from "@/lib/consent";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -138,25 +140,31 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <CartProvider>
-          <QuickViewProvider>
-            <div className="flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1">
-                {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-                <Outlet />
-              </main>
-              <Footer />
-            </div>
-            <CartDrawer />
-            <QuickViewModal />
-            <AuthModal />
-            <PayPalRedirectReturn />
-            <Toaster position="top-center" />
-          </QuickViewProvider>
-        </CartProvider>
-      </AuthProvider>
+      {/* ConsentProvider sits above everything: it is the only thing that
+          ever starts analytics, so nothing below it can load a tracking
+          tag before the visitor has chosen. */}
+      <ConsentProvider>
+        <AuthProvider>
+          <CartProvider>
+            <QuickViewProvider>
+              <div className="flex min-h-screen flex-col">
+                <Header />
+                <main className="flex-1">
+                  {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+                  <Outlet />
+                </main>
+                <Footer />
+              </div>
+              <CartDrawer />
+              <QuickViewModal />
+              <AuthModal />
+              <PayPalRedirectReturn />
+              <CookieBanner />
+              <Toaster position="top-center" />
+            </QuickViewProvider>
+          </CartProvider>
+        </AuthProvider>
+      </ConsentProvider>
     </QueryClientProvider>
   );
 }
