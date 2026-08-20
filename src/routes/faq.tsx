@@ -12,13 +12,13 @@ const slugify = (s: string) => s.toLowerCase().replace(/[^a-z]+/g, "-");
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
-      { title: "FAQ & Help — Ledger&Leaf Templates" },
+      { title: "FAQ & Help — ReadyTrackers Templates" },
       {
         name: "description",
         content:
           "Answers about digital downloads, Excel and Google Sheets compatibility, access issues and our refund policy.",
       },
-      { property: "og:title", content: "FAQ & Help — Ledger&Leaf" },
+      { property: "og:title", content: "FAQ & Help — ReadyTrackers" },
       {
         property: "og:description",
         content: "Downloads, compatibility, access and refunds — answered.",

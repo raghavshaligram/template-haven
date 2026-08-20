@@ -9,12 +9,12 @@ import { money } from "@/data/shop";
 export const Route = createFileRoute("/account")({
   head: () => ({
     meta: [
-      { title: "Account & Downloads — Ledger&Leaf" },
+      { title: "Account & Downloads — ReadyTrackers" },
       {
         name: "description",
         content: "Sign in to re-download your purchased spreadsheet templates any time.",
       },
-      { property: "og:title", content: "Account & Downloads — Ledger&Leaf" },
+      { property: "og:title", content: "Account & Downloads — ReadyTrackers" },
       { property: "og:description", content: "Re-download your purchased templates any time." },
     ],
   }),

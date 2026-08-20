@@ -8,7 +8,7 @@
  */
 
 /** Trading name used throughout the policies. */
-export const SHOP_NAME = "Ledger&Leaf";
+export const SHOP_NAME = "ReadyTrackers";
 
 /**
  * Support / privacy contact. Used on all five policy pages.

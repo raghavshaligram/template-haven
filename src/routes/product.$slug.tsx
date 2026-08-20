@@ -53,7 +53,7 @@ export const Route = createFileRoute("/product/$slug")({
     };
   },
   head: ({ loaderData }) => {
-    const title = loaderData ? `${loaderData.name} — Ledger&Leaf` : "Template — Ledger&Leaf";
+    const title = loaderData ? `${loaderData.name} — ReadyTrackers` : "Template — ReadyTrackers";
     const description = loaderData?.meta ?? "Spreadsheet template for Excel and Google Sheets.";
     return {
       meta: [
@@ -329,7 +329,7 @@ function ProductPage() {
               E
             </span>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-foreground">Ledger&amp;Leaf</p>
+              <p className="text-sm font-semibold text-foreground">ReadyTrackers</p>
               <p className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Store size={12} /> 62,400+ sales · <Stars rating={5} size={11} /> 4.9
               </p>
@@ -371,7 +371,7 @@ function ProductPage() {
             href="#reviews"
             className="mt-2 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
           >
-            <span className="font-medium text-foreground">Ledger&amp;Leaf</span>
+            <span className="font-medium text-foreground">ReadyTrackers</span>
             <Stars rating={product.rating_avg} size={13} />
             <span>({product.review_count.toLocaleString()})</span>
           </a>

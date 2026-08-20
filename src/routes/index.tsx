@@ -10,13 +10,13 @@ import { categories, getProductById, products, reviews } from "@/data/shop";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Ledger&Leaf — Budget & Productivity Spreadsheet Templates" },
+      { title: "ReadyTrackers — Budget & Productivity Spreadsheet Templates" },
       {
         name: "description",
         content:
           "Spreadsheet templates that do the work for you — budgeting, debt payoff, business and planning tools for Excel & Google Sheets. Instant download.",
       },
-      { property: "og:title", content: "Ledger&Leaf — Spreadsheets That Do The Typing For You" },
+      { property: "og:title", content: "ReadyTrackers — Spreadsheets That Do The Typing For You" },
       {
         property: "og:description",
         content: "Budget, debt, business and planning templates for Excel and Google Sheets.",

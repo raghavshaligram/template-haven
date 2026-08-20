@@ -67,7 +67,7 @@ the email; the other becomes a no-op on the same order.
 3. **Resend** (resend.com, free tier is plenty to start):
    - Add secret `RESEND_API_KEY`.
    - Optional: verify your domain and set secret `EMAIL_FROM`, e.g.
-     `Ledger&Leaf <orders@yourdomain.com>`. Until then emails send from
+     `ReadyTrackers <orders@yourdomain.com>`. Until then emails send from
      the Resend sandbox address.
 
 4. **Accounts** (optional — checkout works without doing this, but the

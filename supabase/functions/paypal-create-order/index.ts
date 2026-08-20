@@ -4,7 +4,7 @@
 // then immediately writes it to our own orders/order_items tables as
 // 'pending'. That's the guest-checkout equivalent of the custom_id-based
 // ownership check balanceextract.com uses (see that repo's
-// paypal-create-order/paypal-capture-order comments): Ledger&Leaf has no
+// paypal-create-order/paypal-capture-order comments): ReadyTrackers has no
 // accounts, so instead of "does this order belong to the calling user",
 // paypal-capture-order and paypal-webhook only ever fulfill an order that
 // genuinely exists here as 'pending' — an id that was never created
@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
         intent: "CAPTURE",
         purchase_units: [
           {
-            description: `Ledger&Leaf — ${nameParts.join(", ")}`.slice(0, 127),
+            description: `ReadyTrackers — ${nameParts.join(", ")}`.slice(0, 127),
             amount: { currency_code: "USD", value: amountUsd },
           },
         ],

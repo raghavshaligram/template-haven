@@ -7,9 +7,9 @@ import { money } from "@/data/shop";
 export const Route = createFileRoute("/cart")({
   head: () => ({
     meta: [
-      { title: "Your Cart — Ledger&Leaf" },
+      { title: "Your Cart — ReadyTrackers" },
       { name: "description", content: "Review your spreadsheet templates and check out securely." },
-      { property: "og:title", content: "Your Cart — Ledger&Leaf" },
+      { property: "og:title", content: "Your Cart — ReadyTrackers" },
       { property: "og:description", content: "Review your templates and check out securely." },
     ],
   }),

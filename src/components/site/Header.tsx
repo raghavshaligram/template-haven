@@ -5,6 +5,7 @@ import { useCart } from "@/lib/cart";
 import { products } from "@/data/shop";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Logo } from "@/components/site/Logo";
 
 const NAV = [
   { label: "Best Sellers", to: "/collections/$slug", slug: "best-sellers" },
@@ -50,9 +51,7 @@ export function Header() {
             <button className="md:hidden" aria-label="Open menu" onClick={() => setOpen((v) => !v)}>
               {open ? <X size={22} /> : <Menu size={22} />}
             </button>
-            <Link to="/" className="font-display text-xl font-semibold tracking-tight text-primary">
-              Ledger&amp;Leaf
-            </Link>
+            <Logo />
           </div>
 
           {/* Inline search (desktop) */}

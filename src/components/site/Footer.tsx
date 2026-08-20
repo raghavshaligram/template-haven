@@ -151,7 +151,7 @@ export function Footer() {
           <CreditCard size={16} />
           <span>Visa · Mastercard · Amex · Apple Pay · Google Pay · PayPal</span>
         </div>
-        <p>© {new Date().getFullYear()} Ledger&amp;Leaf. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} ReadyTrackers. All rights reserved.</p>
       </div>
     </footer>
   );

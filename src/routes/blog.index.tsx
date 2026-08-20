@@ -7,13 +7,13 @@ import { coverArt } from "@/lib/blog-covers";
 export const Route = createFileRoute("/blog/")({
   head: () => ({
     meta: [
-      { title: "The Ledger — budgeting guides & spreadsheet how-tos | Ledger&Leaf" },
+      { title: "The Tracker — budgeting guides & spreadsheet how-tos | ReadyTrackers" },
       {
         name: "description",
         content:
           "Practical guides on budgeting, irregular income, and making spreadsheets do the work — from the makers of the Smart Budget Spreadsheet.",
       },
-      { property: "og:title", content: "The Ledger — guides from Ledger&Leaf" },
+      { property: "og:title", content: "The Tracker — guides from ReadyTrackers" },
       {
         property: "og:description",
         content: "Budgeting basics, irregular income systems, and spreadsheet how-tos.",
@@ -48,7 +48,7 @@ function BlogIndex() {
       </nav>
 
       <header className="max-w-2xl">
-        <h1 className="font-display text-4xl md:text-5xl">The Ledger</h1>
+        <h1 className="font-display text-4xl md:text-5xl">The Tracker</h1>
         <p className="mt-3 text-muted-foreground md:text-lg">
           Practical guides on budgeting, irregular income, and making spreadsheets do the work — no
           jargon, no 40-minute reads.

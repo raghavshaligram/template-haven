@@ -32,14 +32,33 @@ type CartCtx = {
 };
 
 const CartContext = createContext<CartCtx | null>(null);
-const KEY = "ledgerleaf-cart";
+const KEY = "readytrackers-cart";
 // sessionStorage (not localStorage) — a "Buy now" is meant to be
 // throwaway once the tab closes, unlike the persisted cart. This only
 // exists so it survives the *same-tab* full-page reload that Google's
 // OAuth redirect causes: someone hits Buy now, decides to sign in first
 // from the drawer, and should land back in the same checkout rather than
 // having their single-item purchase silently vanish.
-const BUY_NOW_KEY = "ledgerleaf-buy-now";
+const BUY_NOW_KEY = "readytrackers-buy-now";
+// Pre-rebrand key. Anyone who added to their cart before the ReadyTrackers
+// rename still has it stored here, and renaming the key alone would empty
+// their cart on next visit with no explanation. Read it once, move it
+// across, delete it. Safe to remove this and migrateLegacyCart() after a
+// release or two, once no browser realistically still holds the old key.
+const LEGACY_KEY = "ledgerleaf-cart";
+
+function migrateLegacyCart(): string | null {
+  try {
+    const legacy = localStorage.getItem(LEGACY_KEY);
+    if (!legacy) return null;
+    // Don't clobber a cart already saved under the new key.
+    if (!localStorage.getItem(KEY)) localStorage.setItem(KEY, legacy);
+    localStorage.removeItem(LEGACY_KEY);
+    return localStorage.getItem(KEY);
+  } catch {
+    return null;
+  }
+}
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
@@ -48,6 +67,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
+      migrateLegacyCart();
       const raw = localStorage.getItem(KEY);
       if (raw) setLines(JSON.parse(raw));
     } catch {

@@ -7,13 +7,13 @@ import { products } from "@/data/shop";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About Ledger&Leaf — Our Story" },
+      { title: "About ReadyTrackers — Our Story" },
       {
         name: "description",
         content:
           "How a late-night budget spreadsheet became a shop of calm, beautiful templates trusted by 62,000+ people.",
       },
-      { property: "og:title", content: "About Ledger&Leaf — Our Story" },
+      { property: "og:title", content: "About ReadyTrackers — Our Story" },
       {
         property: "og:description",
         content: "From one overdraft fee to 62,000+ organized customers. Here's the story.",
@@ -38,7 +38,7 @@ function About() {
           </p>
           <p className="mt-4 text-muted-foreground">
             So I built it. Then I built a debt tracker, because that was the next honest problem.
-            Friends asked for copies, strangers asked next, and Ledger&amp;Leaf turned into a shop
+            Friends asked for copies, strangers asked next, and ReadyTrackers turned into a shop
             without ever really planning to be one.
           </p>
           <p className="mt-4 text-muted-foreground">
@@ -49,7 +49,7 @@ function About() {
         </div>
         <img
           src={founderImg}
-          alt="Elena, founder of Ledger&Leaf, at her desk"
+          alt="Elena, founder of ReadyTrackers, at her desk"
           loading="lazy"
           width={1024}
           height={1024}

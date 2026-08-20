@@ -91,7 +91,7 @@ export async function fulfillOrder(
     // header band
     `<div style="background:#23262F;padding:18px 28px">` +
     `<span style="display:inline-block;width:9px;height:9px;background:#12B76A;border-radius:50%;margin-right:8px"></span>` +
-    `<span style="font:700 16px Arial,sans-serif;color:#ffffff;vertical-align:1px">Ledger&amp;Leaf</span></div>` +
+    `<span style="font:700 16px Arial,sans-serif;color:#ffffff;vertical-align:1px">ReadyTrackers</span></div>` +
     // body
     `<div style="padding:30px 28px;font-family:Arial,sans-serif;color:#23262F">` +
     `<h1 style="font-size:22px;margin:0 0 8px">Your templates are ready 🎉</h1>` +
@@ -115,16 +115,16 @@ export async function fulfillOrder(
     // footer
     `<div style="border-top:1px solid #ECEEF2;padding:14px 28px;background:#FAFAFB">` +
     `<p style="font:400 11px Arial,sans-serif;color:#9CA3AF;margin:0">` +
-    `Ledger&amp;Leaf · Spreadsheets that do the work for you · One-time purchase, no subscription.</p></div>` +
+    `ReadyTrackers · Spreadsheets that do the work for you · One-time purchase, no subscription.</p></div>` +
     `</div></div>`;
 
   const resp = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: Deno.env.get("EMAIL_FROM") ?? "Ledger&Leaf <orders@resend.dev>",
+      from: Deno.env.get("EMAIL_FROM") ?? "ReadyTrackers <orders@resend.dev>",
       to: [email],
-      subject: `Your Ledger&Leaf downloads — order #${orderRef}`,
+      subject: `Your ReadyTrackers downloads — order #${orderRef}`,
       html,
     }),
   });
