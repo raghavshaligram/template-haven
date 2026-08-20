@@ -97,18 +97,28 @@ export function Footer() {
           </h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>
-              <Link to="/faq" hash="refund-policy" className="hover:text-primary">
+              <Link to="/policies/refund-policy" className="hover:text-primary">
                 Refund policy
               </Link>
             </li>
             <li>
-              <Link to="/faq" hash="refund-policy" className="hover:text-primary">
+              <Link to="/policies/delivery-policy" className="hover:text-primary">
+                Digital delivery
+              </Link>
+            </li>
+            <li>
+              <Link to="/policies/terms-of-service" className="hover:text-primary">
                 Terms of service
               </Link>
             </li>
             <li>
-              <Link to="/faq" hash="refund-policy" className="hover:text-primary">
+              <Link to="/policies/privacy-policy" className="hover:text-primary">
                 Privacy policy
+              </Link>
+            </li>
+            <li>
+              <Link to="/policies/cookie-policy" className="hover:text-primary">
+                Cookie policy
               </Link>
             </li>
           </ul>

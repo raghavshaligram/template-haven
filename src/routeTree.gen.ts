@@ -20,6 +20,11 @@ import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout_.success'
 import { Route as CollectionsSlugRouteImport } from './routes/collections.$slug'
+import { Route as PoliciesCookiePolicyRouteImport } from './routes/policies.cookie-policy'
+import { Route as PoliciesDeliveryPolicyRouteImport } from './routes/policies.delivery-policy'
+import { Route as PoliciesPrivacyPolicyRouteImport } from './routes/policies.privacy-policy'
+import { Route as PoliciesRefundPolicyRouteImport } from './routes/policies.refund-policy'
+import { Route as PoliciesTermsOfServiceRouteImport } from './routes/policies.terms-of-service'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -77,6 +82,31 @@ const CollectionsSlugRoute = CollectionsSlugRouteImport.update({
   path: '/collections/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PoliciesCookiePolicyRoute = PoliciesCookiePolicyRouteImport.update({
+  id: '/policies/cookie-policy',
+  path: '/policies/cookie-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoliciesDeliveryPolicyRoute = PoliciesDeliveryPolicyRouteImport.update({
+  id: '/policies/delivery-policy',
+  path: '/policies/delivery-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoliciesPrivacyPolicyRoute = PoliciesPrivacyPolicyRouteImport.update({
+  id: '/policies/privacy-policy',
+  path: '/policies/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoliciesRefundPolicyRoute = PoliciesRefundPolicyRouteImport.update({
+  id: '/policies/refund-policy',
+  path: '/policies/refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoliciesTermsOfServiceRoute = PoliciesTermsOfServiceRouteImport.update({
+  id: '/policies/terms-of-service',
+  path: '/policies/terms-of-service',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
   id: '/product/$slug',
   path: '/product/$slug',
@@ -94,6 +124,11 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/collections/$slug': typeof CollectionsSlugRoute
+  '/policies/cookie-policy': typeof PoliciesCookiePolicyRoute
+  '/policies/delivery-policy': typeof PoliciesDeliveryPolicyRoute
+  '/policies/privacy-policy': typeof PoliciesPrivacyPolicyRoute
+  '/policies/refund-policy': typeof PoliciesRefundPolicyRoute
+  '/policies/terms-of-service': typeof PoliciesTermsOfServiceRoute
   '/product/$slug': typeof ProductSlugRoute
   '/blog/': typeof BlogIndexRoute
 }
@@ -108,6 +143,11 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/collections/$slug': typeof CollectionsSlugRoute
+  '/policies/cookie-policy': typeof PoliciesCookiePolicyRoute
+  '/policies/delivery-policy': typeof PoliciesDeliveryPolicyRoute
+  '/policies/privacy-policy': typeof PoliciesPrivacyPolicyRoute
+  '/policies/refund-policy': typeof PoliciesRefundPolicyRoute
+  '/policies/terms-of-service': typeof PoliciesTermsOfServiceRoute
   '/product/$slug': typeof ProductSlugRoute
   '/blog': typeof BlogIndexRoute
 }
@@ -123,6 +163,11 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/checkout_/success': typeof CheckoutSuccessRoute
   '/collections/$slug': typeof CollectionsSlugRoute
+  '/policies/cookie-policy': typeof PoliciesCookiePolicyRoute
+  '/policies/delivery-policy': typeof PoliciesDeliveryPolicyRoute
+  '/policies/privacy-policy': typeof PoliciesPrivacyPolicyRoute
+  '/policies/refund-policy': typeof PoliciesRefundPolicyRoute
+  '/policies/terms-of-service': typeof PoliciesTermsOfServiceRoute
   '/product/$slug': typeof ProductSlugRoute
   '/blog/': typeof BlogIndexRoute
 }
@@ -139,6 +184,11 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/checkout/success'
     | '/collections/$slug'
+    | '/policies/cookie-policy'
+    | '/policies/delivery-policy'
+    | '/policies/privacy-policy'
+    | '/policies/refund-policy'
+    | '/policies/terms-of-service'
     | '/product/$slug'
     | '/blog/'
   fileRoutesByTo: FileRoutesByTo
@@ -153,6 +203,11 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/checkout/success'
     | '/collections/$slug'
+    | '/policies/cookie-policy'
+    | '/policies/delivery-policy'
+    | '/policies/privacy-policy'
+    | '/policies/refund-policy'
+    | '/policies/terms-of-service'
     | '/product/$slug'
     | '/blog'
   id:
@@ -167,6 +222,11 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/checkout_/success'
     | '/collections/$slug'
+    | '/policies/cookie-policy'
+    | '/policies/delivery-policy'
+    | '/policies/privacy-policy'
+    | '/policies/refund-policy'
+    | '/policies/terms-of-service'
     | '/product/$slug'
     | '/blog/'
   fileRoutesById: FileRoutesById
@@ -182,6 +242,11 @@ export interface RootRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
+  PoliciesCookiePolicyRoute: typeof PoliciesCookiePolicyRoute
+  PoliciesDeliveryPolicyRoute: typeof PoliciesDeliveryPolicyRoute
+  PoliciesPrivacyPolicyRoute: typeof PoliciesPrivacyPolicyRoute
+  PoliciesRefundPolicyRoute: typeof PoliciesRefundPolicyRoute
+  PoliciesTermsOfServiceRoute: typeof PoliciesTermsOfServiceRoute
   ProductSlugRoute: typeof ProductSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
 }
@@ -265,6 +330,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CollectionsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/policies/cookie-policy': {
+      id: '/policies/cookie-policy'
+      path: '/policies/cookie-policy'
+      fullPath: '/policies/cookie-policy'
+      preLoaderRoute: typeof PoliciesCookiePolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/policies/delivery-policy': {
+      id: '/policies/delivery-policy'
+      path: '/policies/delivery-policy'
+      fullPath: '/policies/delivery-policy'
+      preLoaderRoute: typeof PoliciesDeliveryPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/policies/privacy-policy': {
+      id: '/policies/privacy-policy'
+      path: '/policies/privacy-policy'
+      fullPath: '/policies/privacy-policy'
+      preLoaderRoute: typeof PoliciesPrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/policies/refund-policy': {
+      id: '/policies/refund-policy'
+      path: '/policies/refund-policy'
+      fullPath: '/policies/refund-policy'
+      preLoaderRoute: typeof PoliciesRefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/policies/terms-of-service': {
+      id: '/policies/terms-of-service'
+      path: '/policies/terms-of-service'
+      fullPath: '/policies/terms-of-service'
+      preLoaderRoute: typeof PoliciesTermsOfServiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/product/$slug': {
       id: '/product/$slug'
       path: '/product/$slug'
@@ -286,6 +386,11 @@ const rootRouteChildren: RootRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
   CheckoutSuccessRoute: CheckoutSuccessRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,
+  PoliciesCookiePolicyRoute: PoliciesCookiePolicyRoute,
+  PoliciesDeliveryPolicyRoute: PoliciesDeliveryPolicyRoute,
+  PoliciesPrivacyPolicyRoute: PoliciesPrivacyPolicyRoute,
+  PoliciesRefundPolicyRoute: PoliciesRefundPolicyRoute,
+  PoliciesTermsOfServiceRoute: PoliciesTermsOfServiceRoute,
   ProductSlugRoute: ProductSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
 }
