@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      customer_profiles: {
+        Row: {
+          created_at: string
+          email: string
+          marketing_consent: boolean
+          marketing_consent_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          marketing_consent?: boolean
+          marketing_consent_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          marketing_consent?: boolean
+          marketing_consent_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       download_tokens: {
         Row: {
           created_at: string
@@ -134,7 +158,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_guest_orders: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never
