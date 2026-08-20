@@ -8,7 +8,7 @@
 //
 // Two safety checks beyond "the client said it worked":
 //   1. orderId must match a row we already wrote as 'pending' in
-//      paypal-create-order. Ledger&Leaf has no accounts, so this is the
+//      paypal-create-order. ReadyTrackers has no accounts, so this is the
 //      guest-checkout equivalent of balanceextract.com's custom_id check
 //      — it stops this endpoint being used to "capture" an arbitrary
 //      PayPal order id that didn't originate from our own checkout.

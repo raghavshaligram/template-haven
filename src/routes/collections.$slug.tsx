@@ -37,7 +37,7 @@ export const Route = createFileRoute("/collections/$slug")({
     return { name: data.name, description: data.description };
   },
   head: ({ loaderData }) => {
-    const title = loaderData ? `${loaderData.name} — Ledger&Leaf` : "Collection — Ledger&Leaf";
+    const title = loaderData ? `${loaderData.name} — ReadyTrackers` : "Collection — ReadyTrackers";
     const description = loaderData?.description ?? "Spreadsheet templates for Excel and Google Sheets.";
     return {
       meta: [

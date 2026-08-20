@@ -7,13 +7,13 @@ import { money, products } from "@/data/shop";
 export const Route = createFileRoute("/plr")({
   head: () => ({
     meta: [
-      { title: "PLR Templates with Resell Rights — Ledger&Leaf" },
+      { title: "PLR Templates with Resell Rights — ReadyTrackers" },
       {
         name: "description",
         content:
           "Buy already-designed, proven spreadsheet templates with full commercial resell rights. Rebrand and sell them as your own.",
       },
-      { property: "og:title", content: "PLR Templates with Resell Rights — Ledger&Leaf" },
+      { property: "og:title", content: "PLR Templates with Resell Rights — ReadyTrackers" },
       {
         property: "og:description",
         content: "Download, customize with your branding, resell it as your own product.",

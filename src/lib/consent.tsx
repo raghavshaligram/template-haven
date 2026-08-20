@@ -16,7 +16,7 @@ type ConsentCtx = {
 };
 
 const ConsentContext = createContext<ConsentCtx | null>(null);
-const STORAGE_KEY = "ledgerleaf-cookie-consent";
+const STORAGE_KEY = "readytrackers-cookie-consent";
 
 /**
  * Owns the visitor's cookie choice and is the ONLY thing that ever starts

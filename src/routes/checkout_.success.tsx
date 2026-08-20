@@ -11,7 +11,7 @@ export const Route = createFileRoute("/checkout_/success")({
     order_id: typeof search["order_id"] === "string" ? (search["order_id"] as string) : "",
   }),
   head: () => ({
-    meta: [{ title: "Order complete — Ledger&Leaf" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Order complete — ReadyTrackers" }, { name: "robots", content: "noindex" }],
   }),
   component: SuccessPage,
 });

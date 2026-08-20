@@ -11,7 +11,7 @@ export const Route = createFileRoute("/checkout")({
     return out;
   },
   head: () => ({
-    meta: [{ title: "Ledger&Leaf" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "ReadyTrackers" }, { name: "robots", content: "noindex" }],
   }),
   component: CheckoutRedirect,
 });

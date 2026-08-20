@@ -13,8 +13,8 @@ export const Route = createFileRoute("/blog/$slug")({
     return { title: post.title, meta: post.meta_description };
   },
   head: ({ loaderData }) => {
-    const title = loaderData ? `${loaderData.title} | The Ledger` : "The Ledger | Ledger&Leaf";
-    const description = loaderData?.meta ?? "Budgeting guides from Ledger&Leaf.";
+    const title = loaderData ? `${loaderData.title} | The Tracker` : "The Tracker | ReadyTrackers";
+    const description = loaderData?.meta ?? "Budgeting guides from ReadyTrackers.";
     return {
       meta: [
         { title },
@@ -123,7 +123,7 @@ function ArticlePage() {
     description: post.meta_description,
     datePublished: post.date,
     author: { "@type": "Person", name: post.author },
-    publisher: { "@type": "Organization", name: "Ledger&Leaf" },
+    publisher: { "@type": "Organization", name: "ReadyTrackers" },
     articleSection: post.cluster,
   };
 
@@ -172,7 +172,7 @@ function ArticlePage() {
             </span>
             <div className="text-sm">
               <p className="font-semibold text-foreground">{post.author}</p>
-              <p className="text-xs text-muted-foreground">Founder, Ledger&amp;Leaf</p>
+              <p className="text-xs text-muted-foreground">Founder, ReadyTrackers</p>
             </div>
           </div>
           <button

@@ -89,14 +89,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Ledger&Leaf — Budget & Productivity Spreadsheet Templates" },
+      { title: "ReadyTrackers — Budget & Productivity Spreadsheet Templates" },
       {
         name: "description",
         content:
           "Beautiful, ready-to-use Excel and Google Sheets templates for budgeting, debt payoff and planning.",
       },
-      { name: "author", content: "Ledger&Leaf" },
-      { property: "og:title", content: "Ledger&Leaf — Spreadsheet Templates" },
+      { name: "author", content: "ReadyTrackers" },
+      { property: "og:title", content: "ReadyTrackers — Spreadsheet Templates" },
       {
         property: "og:description",
         content: "Budget, debt and planning templates for Excel and Google Sheets.",
@@ -112,7 +112,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      // SVG first for browsers that support it (crisp at any size); the
+      // multi-size .ico is the fallback. Both draw the same mark.
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,
