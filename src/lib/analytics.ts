@@ -94,6 +94,34 @@ export function loadAnalytics(): boolean {
 }
 
 /**
+ * Report a custom event.
+ *
+ * Deliberately silent when GA4 isn't configured or the visitor declined —
+ * call sites shouldn't have to know or care, so they can be written once
+ * and start reporting the day a Measurement ID is added. Returns whether
+ * anything was actually sent, which is what the tests assert on.
+ */
+export function trackEvent(name: string, params?: Record<string, unknown>): boolean {
+  if (typeof window === "undefined") return false;
+  // No tag loaded => either unconfigured or unconsented. Either way this
+  // must not queue anything that could fire later without permission.
+  if (!document.getElementById(GA_SCRIPT_ID)) return false;
+  window.gtag?.("event", name, params ?? {});
+  return true;
+}
+
+/**
+ * The two post-purchase metrics, kept deliberately separate because they
+ * are two different decisions: someone can make an account without opting
+ * into marketing, and the opt-in rate is only meaningful measured against
+ * the people who made an account.
+ */
+export const ANALYTICS_EVENTS = {
+  postPurchaseAccountCreated: "post_purchase_account_created",
+  marketingOptIn: "marketing_opt_in",
+} as const;
+
+/**
  * Withdraw consent: signal denial and clear the cookies GA already set.
  * The script tag itself can't be unloaded from a live page, so the honest
  * behaviour is to stop it storing anything and bin what exists; a reload
