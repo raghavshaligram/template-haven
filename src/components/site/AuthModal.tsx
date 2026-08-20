@@ -33,17 +33,20 @@ export function AuthModal() {
   async function handleGoogle() {
     setError(null);
     setBusy(true);
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.href },
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
     });
-    // On success this navigates away to Google immediately, so there's
-    // nothing else to do here — only errors starting the redirect land.
-    if (oauthError) {
-      setError(oauthError.message);
+    if (result.error) {
+      setError(result.error.message ?? "Could not sign in with Google.");
       setBusy(false);
+      return;
     }
+    // Redirect flow: the browser navigates away to Google. Popup flow:
+    // the session is already set and AuthProvider closes the modal.
+    if (result.redirected) return;
+    setBusy(false);
   }
+
 
   async function handleEmailPassword(e: React.FormEvent) {
     e.preventDefault();
