@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { fetchOrder } from "@/lib/checkout";
 import { getProduct, money } from "@/data/shop";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
+import { PostPurchaseAccountPrompt } from "@/components/site/PostPurchaseAccountPrompt";
 
 export const Route = createFileRoute("/checkout_/success")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -21,6 +23,7 @@ type OrderData = NonNullable<Awaited<ReturnType<typeof fetchOrder>>>;
 function SuccessPage() {
   const { order_id } = useSearch({ from: "/checkout_/success" });
   const { clear } = useCart();
+  const { user, loading: authLoading } = useAuth();
   const [order, setOrder] = useState<OrderData | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
 
@@ -145,6 +148,24 @@ function SuccessPage() {
               Total paid: {money((order.amountTotal ?? 0) / 100)} · Open the DEMO file first — it
               shows everything working before you touch your BLANK copy.
             </p>
+
+            {/* Strictly below the downloads, and only for guests — someone
+                already signed in has an account and a library already.
+                Held back until the auth check settles so it can't flash
+                at a signed-in buyer. */}
+            {!authLoading && !user && (
+              <PostPurchaseAccountPrompt defaultEmail={order.email ?? ""} orderId={order_id} />
+            )}
+
+            {!authLoading && user && (
+              <p className="mt-10 text-center text-sm text-muted-foreground">
+                Saved to your account —{" "}
+                <Link to="/account" className="font-medium text-accent hover:underline">
+                  view all your downloads
+                </Link>
+                .
+              </p>
+            )}
           </div>
         )}
       </div>
