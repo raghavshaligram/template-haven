@@ -128,7 +128,7 @@ export function Footer() {
           <h3 className="mb-4 font-display text-sm font-semibold uppercase tracking-wide">
             Stay organized
           </h3>
-          <Newsletter />
+          <Newsletter stacked />
           <div className="mt-6 flex items-center gap-4 text-muted-foreground">
             <a href="#" aria-label="Instagram">
               <Instagram size={18} />
