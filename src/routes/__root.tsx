@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -20,7 +21,7 @@ import { AuthModal } from "@/components/site/AuthModal";
 import { CookieBanner } from "@/components/site/CookieBanner";
 import { CartProvider } from "@/lib/cart";
 import { QuickViewProvider } from "@/lib/quick-view";
-import { AuthProvider } from "@/lib/auth";
+import { AuthProvider, useAuth } from "@/lib/auth";
 import { ConsentProvider } from "@/lib/consent";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -151,14 +152,7 @@ function RootComponent() {
         <AuthProvider>
           <CartProvider>
             <QuickViewProvider>
-              <div className="flex min-h-screen flex-col">
-                <Header />
-                <main className="flex-1">
-                  {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-                  <Outlet />
-                </main>
-                <Footer />
-              </div>
+              <AppChrome />
               <CartDrawer />
               <QuickViewModal />
               <AuthModal />
@@ -170,5 +164,28 @@ function RootComponent() {
         </AuthProvider>
       </ConsentProvider>
     </QueryClientProvider>
+  );
+}
+
+/**
+ * Site chrome lives here so it can step aside for full-bleed pages.
+ * The signed-out /account route is a full-screen sign-up split styled
+ * after balanceextract.com/signup — it renders its own logo and
+ * back-home link, so the global header and footer are hidden there.
+ */
+function AppChrome() {
+  const { user } = useAuth();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const bare = pathname === "/account" && !user;
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      {!bare && <Header />}
+      <main className="flex-1">
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </main>
+      {!bare && <Footer />}
+    </div>
   );
 }
