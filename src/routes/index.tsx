@@ -5,9 +5,11 @@ import { SpreadsheetMock } from "@/components/site/SpreadsheetMock";
 import { Stars } from "@/components/site/Stars";
 import { Newsletter } from "@/components/site/Newsletter";
 import { Button } from "@/components/ui/button";
-import { categories, getProductById, products, reviews } from "@/data/shop";
+import { categories, getProduct, products } from "@/data/shop";
+import { fetchStats } from "@/lib/stats";
 
 export const Route = createFileRoute("/")({
+  loader: async () => fetchStats(),
   head: () => ({
     meta: [
       { title: "ReadyTrackers — Budget & Productivity Spreadsheet Templates" },
@@ -26,17 +28,30 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const STATS = [
-  { value: "62,400+", label: "templates downloaded" },
-  { value: "4.9", label: "average rating" },
-  { value: "8", label: "templates & bundles" },
-  { value: "0", label: "formulas you'll ever write" },
-];
-
 function Home() {
+  const { site, products: liveProductStats } = Route.useLoaderData();
   const catalog = products.slice(0, 8);
-  const featuredReviews = reviews.filter((r) => r.rating === 5).slice(0, 3);
+  const featuredReviews = site.featuredReviews.slice(0, 3);
+  const hasReviews = site.totalReviews > 0;
   const countFor = (slug: string) => products.filter((p) => p.category === slug).length;
+
+  // Real numbers only — every tile here reflects an actual query result. A
+  // tile is only shown once its number is genuinely non-zero; a brand-new
+  // (or newly-fixed) store legitimately shows fewer tiles rather than a
+  // padded "0" or a fabricated placeholder like the old "62,400+".
+  const stats: { value: string; label: string }[] = [
+    { value: `${products.length}`, label: "templates & bundles" },
+    { value: "0", label: "formulas you'll ever write" },
+  ];
+  if (site.totalSalesCount > 0) {
+    stats.unshift({
+      value: `${site.totalSalesCount.toLocaleString()}+`,
+      label: "templates downloaded",
+    });
+  }
+  if (hasReviews) {
+    stats.splice(1, 0, { value: `${site.ratingAvg}`, label: "average rating" });
+  }
 
   return (
     <div>
@@ -81,11 +96,15 @@ function Home() {
               </Link>
             </Button>
           </div>
-          <div className="mt-5 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <Stars rating={5} size={14} />
-            <span className="font-semibold text-foreground">4.9</span>
-            <span>from 12,000+ reviews</span>
-          </div>
+          {hasReviews && (
+            <div className="mt-5 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <Stars rating={site.ratingAvg} size={14} />
+              <span className="font-semibold text-foreground">{site.ratingAvg}</span>
+              <span>
+                from {site.totalReviews.toLocaleString()} review{site.totalReviews === 1 ? "" : "s"}
+              </span>
+            </div>
+          )}
 
           {/* generic dashboard mockup — what every template's dashboard feels like */}
           <div className="relative mx-auto mt-12 max-w-4xl">
@@ -103,7 +122,7 @@ function Home() {
       {/* ============ STATS BAND ============ */}
       <section className="border-y border-border bg-card">
         <div className="container-page grid grid-cols-2 gap-y-8 py-10 md:grid-cols-4">
-          {STATS.map((s) => (
+          {stats.map((s) => (
             <div key={s.label} className="text-center">
               <p className="font-display text-3xl font-semibold text-foreground md:text-4xl">
                 {s.value}
@@ -168,7 +187,13 @@ function Home() {
         </div>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {catalog.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <ProductCard
+              key={p.id}
+              product={p}
+              bestSeller={site.bestSellerSlugs.includes(p.slug)}
+              reviewCount={liveProductStats[p.slug]?.reviewCount ?? 0}
+              ratingAvg={liveProductStats[p.slug]?.ratingAvg ?? 0}
+            />
           ))}
         </div>
       </section>
@@ -316,40 +341,57 @@ function Home() {
       {/* ============ DARK REVIEWS SECTION ============ */}
       <section className="bg-primary text-primary-foreground">
         <div className="container-page py-20">
-          <div className="grid gap-10 lg:grid-cols-[0.8fr_2fr]">
+          <div
+            className={
+              hasReviews && featuredReviews.length > 0
+                ? "grid gap-10 lg:grid-cols-[0.8fr_2fr]"
+                : "mx-auto max-w-xl text-center"
+            }
+          >
             <div>
-              <p className="font-display text-6xl font-semibold">4.9</p>
-              <Stars rating={5} size={18} className="mt-2" />
-              <p className="mt-3 text-sm text-primary-foreground/70">
-                12,000+ reviews across all templates
-              </p>
+              {hasReviews ? (
+                <>
+                  <p className="font-display text-6xl font-semibold">{site.ratingAvg}</p>
+                  <Stars rating={site.ratingAvg} size={18} className="mt-2" />
+                  <p className="mt-3 text-sm text-primary-foreground/70">
+                    {site.totalReviews.toLocaleString()} review{site.totalReviews === 1 ? "" : "s"}{" "}
+                    across all templates
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm font-semibold uppercase tracking-wide text-primary-foreground/70">
+                  A newer shop, built the same way
+                </p>
+              )}
               <p className="mt-8 border-l-2 border-accent pl-4 text-sm leading-relaxed text-primary-foreground/80">
                 "Everything in the shop is something I use myself. If a tab doesn't earn its place,
                 it doesn't ship." <span className="mt-1 block font-semibold">— Elena, founder</span>
               </p>
             </div>
-            <div className="grid gap-4 sm:grid-cols-3">
-              {featuredReviews.map((r) => {
-                const prod = getProductById(r.product_id);
-                return (
-                  <figure
-                    key={r.id}
-                    className="flex flex-col rounded-2xl bg-primary-foreground/[0.06] p-6 backdrop-blur"
-                  >
-                    <Stars rating={r.rating} size={14} />
-                    <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-primary-foreground/90">
-                      "{r.text}"
-                    </blockquote>
-                    <figcaption className="mt-4 text-xs text-primary-foreground/60">
-                      <span className="font-semibold text-primary-foreground/90">
-                        {r.reviewer_name}
-                      </span>
-                      {prod && <span> · {prod.name}</span>}
-                    </figcaption>
-                  </figure>
-                );
-              })}
-            </div>
+            {hasReviews && featuredReviews.length > 0 && (
+              <div className="grid gap-4 sm:grid-cols-3">
+                {featuredReviews.map((r, i) => {
+                  const prod = getProduct(r.productSlug);
+                  return (
+                    <figure
+                      key={i}
+                      className="flex flex-col rounded-2xl bg-primary-foreground/[0.06] p-6 backdrop-blur"
+                    >
+                      <Stars rating={r.rating} size={14} />
+                      <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-primary-foreground/90">
+                        "{r.body}"
+                      </blockquote>
+                      <figcaption className="mt-4 text-xs text-primary-foreground/60">
+                        <span className="font-semibold text-primary-foreground/90">
+                          {r.reviewerName}
+                        </span>
+                        {prod && <span> · {prod.name}</span>}
+                      </figcaption>
+                    </figure>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -362,7 +404,7 @@ function Home() {
             Subscribe and we'll send the Monthly Expense Tracker plus 15% off your first order.
           </p>
           <div className="mx-auto mt-7 max-w-md">
-            <Newsletter compact />
+            <Newsletter compact subscriberCount={site.subscriberCount} />
           </div>
         </div>
       </section>

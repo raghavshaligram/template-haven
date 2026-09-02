@@ -7,6 +7,7 @@ import { Stars } from "@/components/site/Stars";
 import { useCart } from "@/lib/cart";
 import { useQuickView } from "@/lib/quick-view";
 import { discountPct, money, type Product } from "@/data/shop";
+import { fetchStats } from "@/lib/stats";
 
 /**
  * A short, grid-friendly preview of a product — image, price, colorway,
@@ -24,13 +25,33 @@ export function QuickViewModal() {
   const [displayProduct, setDisplayProduct] = useState<Product | null>(null);
   const [colorway, setColorway] = useState("");
   const [img, setImg] = useState(0);
+  // Real numbers only, fetched live for whichever product is open — this
+  // modal has no SSR loader of its own, so it asks product-stats directly
+  // rather than ever falling back to a hardcoded rating/review/bestseller
+  // value. Defaults to the honest zero/false state until the fetch resolves.
+  const [liveStats, setLiveStats] = useState({ reviewCount: 0, ratingAvg: 0, bestSeller: false });
 
   useEffect(() => {
     if (product) {
       setDisplayProduct(product);
       setColorway(product.colorway_variants[0]?.name ?? "");
       setImg(0);
+      setLiveStats({ reviewCount: 0, ratingAvg: 0, bestSeller: false });
+      let cancelled = false;
+      fetchStats({ slug: product.slug }).then((s) => {
+        if (cancelled) return;
+        const stat = s.products[product.slug];
+        setLiveStats({
+          reviewCount: stat?.reviewCount ?? 0,
+          ratingAvg: stat?.ratingAvg ?? 0,
+          bestSeller: s.site.bestSellerSlugs.includes(product.slug),
+        });
+      });
+      return () => {
+        cancelled = true;
+      };
     }
+    return undefined;
   }, [product]);
 
   const p = displayProduct;
@@ -84,16 +105,22 @@ export function QuickViewModal() {
 
           {/* Details */}
           <div className="flex flex-col p-5 sm:p-6">
-            {p.best_seller && (
+            {liveStats.bestSeller && (
               <span className="w-fit rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground">
                 Bestseller
               </span>
             )}
             <h2 className="mt-2 font-display text-xl leading-snug">{p.name}</h2>
             <div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Stars rating={p.rating_avg} size={13} />
-              <span className="tabular-nums">{p.rating_avg.toFixed(1)}</span>
-              <span>({p.review_count.toLocaleString()})</span>
+              {liveStats.reviewCount > 0 ? (
+                <>
+                  <Stars rating={liveStats.ratingAvg} size={13} />
+                  <span className="tabular-nums">{liveStats.ratingAvg.toFixed(1)}</span>
+                  <span>({liveStats.reviewCount.toLocaleString()})</span>
+                </>
+              ) : (
+                <span>No reviews yet</span>
+              )}
             </div>
 
             <div className="mt-3 flex items-center gap-2">
