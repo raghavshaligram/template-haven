@@ -16,6 +16,7 @@ import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as PlrRouteImport } from './routes/plr'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
@@ -61,6 +62,11 @@ const FaqRoute = FaqRouteImport.update({
 const PlrRoute = PlrRouteImport.update({
   id: '/plr',
   path: '/plr',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/faq': typeof FaqRoute
   '/plr': typeof PlrRoute
+  '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/checkout/success': typeof CheckoutSuccessRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/faq': typeof FaqRoute
   '/plr': typeof PlrRoute
+  '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/checkout/success': typeof CheckoutSuccessRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/faq': typeof FaqRoute
   '/plr': typeof PlrRoute
+  '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/checkout_/success': typeof CheckoutSuccessRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/faq'
     | '/plr'
+    | '/signup'
     | '/auth/callback'
     | '/blog/$slug'
     | '/checkout/success'
@@ -210,6 +220,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/faq'
     | '/plr'
+    | '/signup'
     | '/auth/callback'
     | '/blog/$slug'
     | '/checkout/success'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/faq'
     | '/plr'
+    | '/signup'
     | '/auth/callback'
     | '/blog/$slug'
     | '/checkout_/success'
@@ -251,6 +263,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   FaqRoute: typeof FaqRoute
   PlrRoute: typeof PlrRoute
+  SignupRoute: typeof SignupRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   BlogSlugRoute: typeof BlogSlugRoute
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
@@ -313,6 +326,13 @@ declare module '@tanstack/react-router' {
       path: '/plr'
       fullPath: '/plr'
       preLoaderRoute: typeof PlrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/callback': {
@@ -403,6 +423,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   FaqRoute: FaqRoute,
   PlrRoute: PlrRoute,
+  SignupRoute: SignupRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   BlogSlugRoute: BlogSlugRoute,
   CheckoutSuccessRoute: CheckoutSuccessRoute,
