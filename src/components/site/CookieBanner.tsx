@@ -23,31 +23,33 @@ export function CookieBanner() {
       role="dialog"
       aria-live="polite"
       aria-label="Cookie choices"
-      className="fixed inset-x-0 bottom-0 z-[80] border-t border-border bg-background/95 p-4 shadow-lift backdrop-blur sm:p-5"
+      className="fixed inset-x-4 bottom-4 z-[80] sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-96"
     >
-      <div className="container-page flex flex-col gap-4 sm:flex-row sm:items-center">
-        <Cookie size={20} className="hidden shrink-0 text-accent sm:block" />
-        <p className="flex-1 text-sm leading-relaxed text-foreground/85">
-          We'd like to use analytics cookies to understand which templates people find useful.
-          They're optional — decline and the site works exactly the same.{" "}
-          <Link
-            to="/policies/cookie-policy"
-            className="font-medium text-accent underline underline-offset-2 hover:text-accent/80"
-          >
-            What we'd track
-          </Link>
-        </p>
-        <div className="flex shrink-0 gap-2.5">
+      <div className="rounded-2xl border border-border bg-background/95 p-5 shadow-lift backdrop-blur">
+        <div className="flex items-start gap-3">
+          <Cookie size={20} className="mt-0.5 shrink-0 text-accent" />
+          <p className="text-sm leading-relaxed text-foreground/85">
+            We'd like to use analytics cookies to understand which templates people find useful.
+            They're optional — decline and the site works exactly the same.{" "}
+            <Link
+              to="/policies/cookie-policy"
+              className="font-medium text-accent underline underline-offset-2 hover:text-accent/80"
+            >
+              What we'd track
+            </Link>
+          </p>
+        </div>
+        <div className="mt-4 flex gap-2.5">
           <Button
             variant="outline"
             onClick={decline}
-            className="h-10 flex-1 rounded-full px-5 text-sm sm:flex-none"
+            className="h-10 flex-1 rounded-full px-5 text-sm"
           >
             Decline
           </Button>
           <Button
             onClick={accept}
-            className="h-10 flex-1 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 sm:flex-none"
+            className="h-10 flex-1 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
           >
             Accept
           </Button>
