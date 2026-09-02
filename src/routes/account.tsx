@@ -20,6 +20,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/lib/auth";
 import { fetchMyOrders, type MyOrder } from "@/lib/checkout";
 import { money } from "@/data/shop";
+import { fetchStats } from "@/lib/stats";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
@@ -160,7 +161,10 @@ function SignUpSplit() {
 
           <form className="space-y-5" onSubmit={onEmailSignUp}>
             <div>
-              <label htmlFor="account-email" className="mb-1.5 block text-sm font-semibold text-foreground">
+              <label
+                htmlFor="account-email"
+                className="mb-1.5 block text-sm font-semibold text-foreground"
+              >
                 Email
               </label>
               <input
@@ -176,7 +180,10 @@ function SignUpSplit() {
             </div>
 
             <div>
-              <label htmlFor="account-password" className="mb-1.5 block text-sm font-semibold text-foreground">
+              <label
+                htmlFor="account-password"
+                className="mb-1.5 block text-sm font-semibold text-foreground"
+              >
                 Password
               </label>
               <div className="relative">
@@ -244,6 +251,20 @@ function SignUpSplit() {
 }
 
 function BrandPanel() {
+  // Real reviews only — this page has no route loader, so it fetches live
+  // stats itself rather than ever hardcoding a "trusted by N" claim.
+  const [totalReviews, setTotalReviews] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchStats().then((s) => {
+      if (!cancelled) setTotalReviews(s.site.totalReviews);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <div className="relative hidden overflow-hidden bg-primary lg:block">
       <div
@@ -330,7 +351,9 @@ function BrandPanel() {
         </div>
 
         <div className="mt-8 text-xs text-background/60">
-          Trusted by 62,000+ creators, coaches & small business owners.
+          {totalReviews > 0
+            ? `Trusted by ${totalReviews.toLocaleString()}+ reviewers.`
+            : "One-time purchase, no subscription — templates we use ourselves."}
         </div>
       </div>
     </div>
