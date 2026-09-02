@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -10,15 +10,12 @@ import {
   Palette,
   Play,
   Share2,
-  Star,
   Store,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Stars } from "@/components/site/Stars";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Accordion,
   AccordionContent,
@@ -33,25 +30,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCart } from "@/lib/cart";
-import { discountPct, getCategory, getProduct, money, products } from "@/data/shop";
-import { fetchStats, submitReview, type ProductReview } from "@/lib/stats";
+import {
+  discountPct,
+  getCategory,
+  getProduct,
+  getProductById,
+  money,
+  products,
+  reviewsFor,
+} from "@/data/shop";
 
 const REVIEWS_PER_PAGE = 3;
 
 export const Route = createFileRoute("/product/$slug")({
-  loader: async ({ params }) => {
+  loader: ({ params }) => {
     const product = getProduct(params.slug);
     if (!product) throw notFound();
-    const relatedSlugs = products
-      .filter((p) => p.id !== product.id)
-      .slice(0, 4)
-      .map((p) => p.slug);
-    const stats = await fetchStats({ slug: product.slug, slugs: [product.slug, ...relatedSlugs] });
     return {
       name: product.name,
       tagline: product.tagline,
       meta: product.meta_description ?? product.tagline,
-      stats,
     };
   },
   head: ({ loaderData }) => {
@@ -71,7 +69,6 @@ export const Route = createFileRoute("/product/$slug")({
 
 function ProductPage() {
   const { slug } = Route.useParams();
-  const loaderData = Route.useLoaderData();
   const product = getProduct(slug)!;
   const { add, openCart, buyNow } = useCart();
 
@@ -79,26 +76,6 @@ function ProductPage() {
   const [colorway, setColorway] = useState(product.colorway_variants[0]!.name);
   const [reviewPage, setReviewPage] = useState(1);
   const [fav, setFav] = useState(false);
-
-  // Live reviews are seeded from the SSR loader; new submissions are added
-  // to this local copy immediately so the page feels responsive without a
-  // full reload — the review itself is already durably saved server-side
-  // by the time this state updates (submitReview only resolves ok on a
-  // confirmed insert).
-  const [liveReviews, setLiveReviews] = useState<ProductReview[]>(loaderData.stats.reviews ?? []);
-  const stat = loaderData.stats.products[product.slug];
-  const isBestSeller = loaderData.stats.site.bestSellerSlugs.includes(product.slug);
-  const site = loaderData.stats.site;
-
-  const [showReviewForm, setShowReviewForm] = useState(false);
-  const [reviewSubmitting, setReviewSubmitting] = useState(false);
-  const [reviewForm, setReviewForm] = useState({
-    email: "",
-    orderRef: "",
-    reviewerName: "",
-    rating: 5,
-    body: "",
-  });
 
   const category = getCategory(product.category);
 
@@ -112,40 +89,7 @@ function ProductPage() {
     }
   }
 
-  async function submitReviewForm(e: FormEvent) {
-    e.preventDefault();
-    setReviewSubmitting(true);
-    const result = await submitReview({
-      email: reviewForm.email,
-      orderRef: reviewForm.orderRef,
-      productSlug: product.slug,
-      rating: reviewForm.rating,
-      reviewerName: reviewForm.reviewerName,
-      body: reviewForm.body,
-    });
-    setReviewSubmitting(false);
-    if (!result.ok) {
-      toast.error(result.error);
-      return;
-    }
-    setLiveReviews((prev) => [
-      {
-        reviewerName: reviewForm.reviewerName,
-        rating: reviewForm.rating,
-        body: reviewForm.body,
-        createdAt: new Date().toISOString(),
-      },
-      ...prev,
-    ]);
-    setReviewForm({ email: "", orderRef: "", reviewerName: "", rating: 5, body: "" });
-    setShowReviewForm(false);
-    toast.success("Thanks — your review is live.");
-  }
-
-  const productReviews = liveReviews;
-  const reviewCount = stat?.reviewCount ?? productReviews.length;
-  const ratingAvg = stat?.ratingAvg ?? 0;
-  const hasReviews = reviewCount > 0;
+  const productReviews = reviewsFor(product.id);
   const related = products.filter((p) => p.id !== product.id).slice(0, 4);
   const alsoBought = products.filter((p) => p.id !== product.id && !p.is_plr).slice(0, 2);
   const off = discountPct(product);
@@ -209,7 +153,7 @@ function ProductPage() {
               height={1024}
               className="aspect-square w-full object-cover"
             />
-            {isBestSeller && (
+            {product.best_seller && (
               <span className="absolute left-3 top-3 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground">
                 Bestseller
               </span>
@@ -387,22 +331,7 @@ function ProductPage() {
             <div className="flex-1">
               <p className="text-sm font-semibold text-foreground">ReadyTrackers</p>
               <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Store size={12} />
-                {site.totalSalesCount > 0 || site.totalReviews > 0 ? (
-                  <>
-                    {site.totalSalesCount > 0 && (
-                      <span>{site.totalSalesCount.toLocaleString()}+ sales</span>
-                    )}
-                    {site.totalSalesCount > 0 && site.totalReviews > 0 && <span>&middot;</span>}
-                    {site.totalReviews > 0 && (
-                      <>
-                        <Stars rating={site.ratingAvg} size={11} /> {site.ratingAvg}
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <span>New shop</span>
-                )}
+                <Store size={12} /> 62,400+ sales · <Stars rating={5} size={11} /> 4.9
               </p>
             </div>
             <Link
@@ -443,14 +372,8 @@ function ProductPage() {
             className="mt-2 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
           >
             <span className="font-medium text-foreground">ReadyTrackers</span>
-            {hasReviews ? (
-              <>
-                <Stars rating={ratingAvg} size={13} />
-                <span>({reviewCount.toLocaleString()})</span>
-              </>
-            ) : (
-              <span>No reviews yet</span>
-            )}
+            <Stars rating={product.rating_avg} size={13} />
+            <span>({product.review_count.toLocaleString()})</span>
           </a>
 
           {/* variant dropdown */}
@@ -578,135 +501,34 @@ function ProductPage() {
         <h2 className="font-display text-2xl">Reviews</h2>
         <div className="mt-6 grid gap-8 lg:grid-cols-[280px_1fr]">
           <div className="h-fit rounded-xl border border-border bg-card p-6">
-            {hasReviews ? (
-              <>
-                <p className="font-display text-4xl">{ratingAvg}</p>
-                <Stars rating={ratingAvg} size={18} />
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Based on {reviewCount.toLocaleString()} review{reviewCount === 1 ? "" : "s"}
-                </p>
-                <div className="mt-4 space-y-2">
-                  {breakdown.map((b) => (
-                    <div key={b.star} className="flex items-center gap-2 text-xs">
-                      <span className="w-8 text-muted-foreground">{b.star}★</span>
-                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-secondary">
-                        <div
-                          className="h-full rounded-full bg-accent"
-                          style={{ width: `${b.pct}%` }}
-                        />
-                      </div>
-                      <span className="w-6 text-right text-muted-foreground">{b.n}</span>
-                    </div>
-                  ))}
+            <p className="font-display text-4xl">{product.rating_avg}</p>
+            <Stars rating={product.rating_avg} size={18} />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Based on {product.review_count.toLocaleString()} reviews
+            </p>
+            <div className="mt-4 space-y-2">
+              {breakdown.map((b) => (
+                <div key={b.star} className="flex items-center gap-2 text-xs">
+                  <span className="w-8 text-muted-foreground">{b.star}★</span>
+                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-secondary">
+                    <div className="h-full rounded-full bg-accent" style={{ width: `${b.pct}%` }} />
+                  </div>
+                  <span className="w-6 text-right text-muted-foreground">{b.n}</span>
                 </div>
-              </>
-            ) : (
-              <div>
-                <p className="font-display text-xl">No reviews yet</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Be the first to review this template.
-                </p>
-              </div>
-            )}
-            {!showReviewForm && (
-              <Button
-                variant="outline"
-                className="mt-5 w-full rounded-full"
-                onClick={() => setShowReviewForm(true)}
-              >
-                Bought this? Write a review
-              </Button>
-            )}
-            {showReviewForm && (
-              <form
-                onSubmit={submitReviewForm}
-                className="mt-5 space-y-3 border-t border-border pt-5"
-              >
-                <p className="text-xs text-muted-foreground">
-                  Only buyers with a real order for this template can review it — we'll check your
-                  email and order number against your purchase.
-                </p>
-                <Input
-                  type="email"
-                  required
-                  placeholder="Email used at checkout"
-                  value={reviewForm.email}
-                  onChange={(e) => setReviewForm((f) => ({ ...f, email: e.target.value }))}
-                />
-                <Input
-                  required
-                  placeholder="Order number (from your confirmation email)"
-                  value={reviewForm.orderRef}
-                  onChange={(e) => setReviewForm((f) => ({ ...f, orderRef: e.target.value }))}
-                />
-                <Input
-                  required
-                  placeholder="Your name (as shown on the review)"
-                  value={reviewForm.reviewerName}
-                  onChange={(e) => setReviewForm((f) => ({ ...f, reviewerName: e.target.value }))}
-                />
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <button
-                      key={n}
-                      type="button"
-                      aria-label={`${n} star${n === 1 ? "" : "s"}`}
-                      onClick={() => setReviewForm((f) => ({ ...f, rating: n }))}
-                    >
-                      <Star
-                        size={20}
-                        className={
-                          n <= reviewForm.rating
-                            ? "fill-accent text-accent"
-                            : "text-muted-foreground/40"
-                        }
-                      />
-                    </button>
-                  ))}
-                </div>
-                <Textarea
-                  required
-                  placeholder="What was your experience?"
-                  value={reviewForm.body}
-                  onChange={(e) => setReviewForm((f) => ({ ...f, body: e.target.value }))}
-                  rows={3}
-                />
-                <div className="flex gap-2">
-                  <Button type="submit" disabled={reviewSubmitting} className="rounded-full">
-                    {reviewSubmitting ? "Submitting…" : "Submit review"}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setShowReviewForm(false)}
-                    className="rounded-full"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            )}
+              ))}
+            </div>
           </div>
 
           <div>
             <ul className="space-y-4">
-              {shownReviews.map((r, i) => (
-                <li
-                  key={`${r.createdAt}-${i}`}
-                  className="rounded-xl border border-border bg-card p-5"
-                >
+              {shownReviews.map((r) => (
+                <li key={r.id} className="rounded-xl border border-border bg-card p-5">
                   <div className="flex items-center justify-between">
-                    <p className="font-medium">{r.reviewerName}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(r.createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </p>
+                    <p className="font-medium">{r.reviewer_name}</p>
+                    <p className="text-xs text-muted-foreground">{r.date}</p>
                   </div>
                   <Stars rating={r.rating} className="mt-1" />
-                  <p className="mt-3 text-sm text-muted-foreground">{r.body}</p>
+                  <p className="mt-3 text-sm text-muted-foreground">{r.text}</p>
                 </li>
               ))}
               {shownReviews.length === 0 && (
@@ -737,13 +559,7 @@ function ProductPage() {
         <h2 className="font-display text-2xl">You may also like</h2>
         <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {related.map((p) => (
-            <ProductCard
-              key={p.id}
-              product={p}
-              bestSeller={loaderData.stats.site.bestSellerSlugs.includes(p.slug)}
-              reviewCount={loaderData.stats.products[p.slug]?.reviewCount ?? 0}
-              ratingAvg={loaderData.stats.products[p.slug]?.ratingAvg ?? 0}
-            />
+            <ProductCard key={p.id} product={p} />
           ))}
         </div>
       </section>

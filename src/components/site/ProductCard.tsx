@@ -6,23 +6,7 @@ import { discountPct, money, type Product } from "@/data/shop";
 import { cn } from "@/lib/utils";
 import { useQuickView } from "@/lib/quick-view";
 
-export function ProductCard({
-  product,
-  bestSeller = false,
-  reviewCount = 0,
-  ratingAvg = 0,
-}: {
-  product: Product;
-  // Real, earned values only — every prop here is passed in by the caller
-  // from a live fetchStats() result (see src/lib/stats.ts). There are no
-  // static best_seller/rating_avg/review_count fields on Product any more;
-  // never wire these to a hardcoded value. Omitting a prop renders the
-  // honest zero/empty state, which is correct for a template with no real
-  // sales or reviews yet.
-  bestSeller?: boolean;
-  reviewCount?: number;
-  ratingAvg?: number;
-}) {
+export function ProductCard({ product }: { product: Product }) {
   const hover = product.images[1] ?? product.images[0];
   const off = discountPct(product);
   const [saved, setSaved] = useState(false);
@@ -54,7 +38,7 @@ export function ProductCard({
         />
         {/* badges */}
         <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5">
-          {bestSeller && (
+          {product.best_seller && (
             <span className="rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground shadow-sm">
               Bestseller
             </span>
@@ -105,15 +89,11 @@ export function ProductCard({
           {product.name}
         </h3>
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          {reviewCount > 0 ? (
-            <>
-              <Stars rating={ratingAvg} size={12} />
-              <span className="tabular-nums">{ratingAvg.toFixed(1)}</span>
-              <span className="text-muted-foreground/70">({reviewCount.toLocaleString()})</span>
-            </>
-          ) : (
-            <span className="text-muted-foreground/70">No reviews yet</span>
-          )}
+          <Stars rating={product.rating_avg} size={12} />
+          <span className="tabular-nums">{product.rating_avg.toFixed(1)}</span>
+          <span className="text-muted-foreground/70">
+            ({product.review_count.toLocaleString()})
+          </span>
         </div>
         <div className="mt-auto flex items-center gap-2 pt-1">
           <span className="text-[15px] font-bold text-foreground">{money(product.sale_price)}</span>

@@ -5,17 +5,12 @@ import { Stars } from "@/components/site/Stars";
 import { getPost, relatedPosts, type BlogBlock } from "@/data/blog";
 import { getProduct, money } from "@/data/shop";
 import { coverArt } from "@/lib/blog-covers";
-import { fetchStats, type StatsResponse } from "@/lib/stats";
 
 export const Route = createFileRoute("/blog/$slug")({
-  loader: async ({ params }) => {
+  loader: ({ params }) => {
     const post = getPost(params.slug);
     if (!post) throw notFound();
-    // Real numbers for any product embedded via a "cta" block — never fall
-    // back to a hardcoded rating/review count on this page either.
-    const ctaSlugs = post.blocks.filter((b) => b.type === "cta").map((b) => b.slug);
-    const stats = await fetchStats({ slugs: ctaSlugs });
-    return { title: post.title, meta: post.meta_description, stats };
+    return { title: post.title, meta: post.meta_description };
   },
   head: ({ loaderData }) => {
     const title = loaderData ? `${loaderData.title} | The Tracker` : "The Tracker | ReadyTrackers";
@@ -41,7 +36,7 @@ function fmtDate(iso: string) {
   });
 }
 
-function Block({ block, stats }: { block: BlogBlock; stats: StatsResponse }) {
+function Block({ block }: { block: BlogBlock }) {
   switch (block.type) {
     case "h2":
       return <h2 className="mt-10 font-display text-2xl">{block.text}</h2>;
@@ -70,9 +65,6 @@ function Block({ block, stats }: { block: BlogBlock; stats: StatsResponse }) {
     case "cta": {
       const prod = getProduct(block.slug);
       if (!prod) return null;
-      const stat = stats.products[block.slug];
-      const reviewCount = stat?.reviewCount ?? 0;
-      const ratingAvg = stat?.ratingAvg ?? 0;
       return (
         <Link
           to="/product/$slug"
@@ -93,16 +85,10 @@ function Block({ block, stats }: { block: BlogBlock; stats: StatsResponse }) {
             <p className="mt-1 font-display text-lg">{prod.name}</p>
             <p className="mt-1 text-sm text-muted-foreground">{block.text}</p>
             <div className="mt-2 flex items-center gap-2 text-sm">
-              {reviewCount > 0 ? (
-                <>
-                  <Stars rating={ratingAvg} size={13} />
-                  <span className="text-muted-foreground">
-                    {ratingAvg} ({reviewCount.toLocaleString()})
-                  </span>
-                </>
-              ) : (
-                <span className="text-muted-foreground">No reviews yet</span>
-              )}
+              <Stars rating={prod.rating_avg} size={13} />
+              <span className="text-muted-foreground">
+                {prod.rating_avg} ({prod.review_count.toLocaleString()})
+              </span>
               <span className="font-bold text-foreground">{money(prod.sale_price)}</span>
             </div>
           </div>
@@ -117,7 +103,6 @@ function Block({ block, stats }: { block: BlogBlock; stats: StatsResponse }) {
 
 function ArticlePage() {
   const { slug } = Route.useParams();
-  const { stats } = Route.useLoaderData();
   const post = getPost(slug)!;
   const related = relatedPosts(post);
 
@@ -207,7 +192,7 @@ function ArticlePage() {
         {/* Body */}
         <div className="mt-2 text-[16.5px]">
           {post.blocks.map((b, i) => (
-            <Block key={i} block={b} stats={stats} />
+            <Block key={i} block={b} />
           ))}
         </div>
       </article>
