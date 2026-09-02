@@ -29,17 +29,3 @@ verify_jwt = false
 # depends on being reachable with no session at all.
 [functions.get-my-orders]
 verify_jwt = true
-
-# product-stats, submit-review, and newsletter-subscribe are the real
-# mechanisms behind what used to be hardcoded review/sales/subscriber
-# numbers on the storefront (see the reviews_and_subscribers migration).
-# All three are called directly from the browser, guest-checkout style —
-# no Supabase auth session is required for any of them.
-[functions.product-stats]
-verify_jwt = false
-
-[functions.submit-review]
-verify_jwt = false
-
-[functions.newsletter-subscribe]
-verify_jwt = false

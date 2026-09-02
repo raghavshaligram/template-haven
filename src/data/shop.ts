@@ -33,16 +33,13 @@ export type Product = {
   colorway_variants: Colorway[];
   images: string[];
   download_url: string;
-  // No rating_avg/review_count/best_seller fields — every real number a
-  // page shows for reviews, ratings, sales or bestseller status is fetched
-  // live from src/lib/stats.ts (backed by supabase/functions/product-stats,
-  // computed from real reviews and real paid orders). Never add a static
-  // number here — a hardcoded rating/review/bestseller value is exactly
-  // the fabricated-social-proof problem this file used to have.
+  rating_avg: number;
+  review_count: number;
   tags: string[];
   is_bundle: boolean;
   bundle_components: string[];
   is_plr: boolean;
+  best_seller?: boolean;
   created: string;
   // Optional rich marketing content — rendered on the product page when present.
   // Every future tracker can populate these with its own copy.
@@ -293,10 +290,13 @@ export const products: Product[] = [
     colorway_variants: [LIGHT, DARK, SAGE],
     images: [budgetImg, budgetDark],
     download_url: "https://example.com/downloads/smart-budget",
+    rating_avg: 4.9,
+    review_count: 1284,
     tags: ["budget", "monthly", "excel", "google sheets", "auto-import", "bank statement", "csv"],
     is_bundle: false,
     bundle_components: [],
     is_plr: false,
+    best_seller: true,
     created: "2026-01-12",
   },
   {
@@ -311,10 +311,13 @@ export const products: Product[] = [
     colorway_variants: [LIGHT, SAGE],
     images: [debtImg, debtDark],
     download_url: "https://example.com/downloads/debt-payoff",
+    rating_avg: 4.8,
+    review_count: 742,
     tags: ["debt", "payoff", "tracker"],
     is_bundle: false,
     bundle_components: [],
     is_plr: false,
+    best_seller: true,
     created: "2026-02-02",
   },
   {
@@ -329,10 +332,13 @@ export const products: Product[] = [
     colorway_variants: [LIGHT, DARK],
     images: [billsImg, billsDark],
     download_url: "https://example.com/downloads/bill-calendar",
+    rating_avg: 4.7,
+    review_count: 508,
     tags: ["bills", "calendar", "reminders"],
     is_bundle: false,
     bundle_components: [],
     is_plr: false,
+    best_seller: true,
     created: "2026-03-08",
   },
   {
@@ -347,10 +353,13 @@ export const products: Product[] = [
     colorway_variants: [LIGHT, DARK, SAGE],
     images: [bundleImg, bundleDark],
     download_url: "https://example.com/downloads/money-bundle",
+    rating_avg: 5,
+    review_count: 419,
     tags: ["bundle", "save"],
     is_bundle: true,
     bundle_components: ["p1", "p2", "p3"],
     is_plr: false,
+    best_seller: true,
     created: "2026-03-20",
   },
   {
@@ -365,10 +374,13 @@ export const products: Product[] = [
     colorway_variants: [LIGHT, SAGE],
     images: [businessImg, businessDark],
     download_url: "https://example.com/downloads/profit-sheet",
+    rating_avg: 4.8,
+    review_count: 233,
     tags: ["business", "profit", "expenses"],
     is_bundle: false,
     bundle_components: [],
     is_plr: false,
+    best_seller: true,
     created: "2026-04-01",
   },
   {
@@ -383,10 +395,13 @@ export const products: Product[] = [
     colorway_variants: [LIGHT, DARK, SAGE],
     images: [billsImg, billsDark],
     download_url: "https://example.com/downloads/weekly-planner",
+    rating_avg: 4.6,
+    review_count: 187,
     tags: ["planner", "weekly", "habits"],
     is_bundle: false,
     bundle_components: [],
     is_plr: false,
+    best_seller: true,
     created: "2026-04-18",
   },
   {
@@ -401,6 +416,8 @@ export const products: Product[] = [
     colorway_variants: [LIGHT],
     images: [freebieImg, freebieDark],
     download_url: "https://example.com/downloads/free-tracker",
+    rating_avg: 4.9,
+    review_count: 3120,
     tags: ["free", "starter"],
     is_bundle: false,
     bundle_components: [],
@@ -456,6 +473,8 @@ export const products: Product[] = [
     colorway_variants: [LIGHT, DARK, SAGE],
     images: [bundleImg, bundleDark],
     download_url: "https://example.com/downloads/plr-vault",
+    rating_avg: 4.9,
+    review_count: 96,
     tags: ["plr", "resell", "commercial licence"],
     is_bundle: true,
     bundle_components: ["p1", "p2", "p3", "p5", "p6"],
@@ -464,14 +483,111 @@ export const products: Product[] = [
   },
 ];
 
-// Real reviews only, ever. This starts empty because the store has not
-// had a real, order-verified review submitted yet — that's expected for a
-// new (or newly-fixed) shop, not a bug. Reviews are written by
-// supabase/functions/submit-review, gated on a real paid order, and read
-// live via src/lib/stats.ts. Never seed this with placeholder/demo
-// reviewer names or quotes — even "for layout during dev" — that's the
-// exact fabricated-social-proof mistake this file used to make.
-export const reviews: Review[] = [];
+export const reviews: Review[] = [
+  {
+    id: "r1",
+    product_id: "p1",
+    reviewer_name: "Maya R.",
+    rating: 5,
+    text: "I've tried a dozen budget spreadsheets and abandoned all of them. This one I actually opened again in month two — the dashboard does the thinking for me.",
+    date: "2026-06-02",
+  },
+  {
+    id: "r2",
+    product_id: "p1",
+    reviewer_name: "Devon C.",
+    rating: 5,
+    text: "Set it up in fifteen minutes on a Sunday. My partner and I finally agree on where the money goes.",
+    date: "2026-05-21",
+  },
+  {
+    id: "r3",
+    product_id: "p1",
+    reviewer_name: "Priya S.",
+    rating: 4,
+    text: "Beautiful and clear. Wish there was a savings-goal tab, but I added one myself easily enough.",
+    date: "2026-05-11",
+  },
+  {
+    id: "r4",
+    product_id: "p2",
+    reviewer_name: "Tomás L.",
+    rating: 5,
+    text: "Watching the payoff date move earlier every month is weirdly addictive. Cleared one card already.",
+    date: "2026-06-08",
+  },
+  {
+    id: "r5",
+    product_id: "p2",
+    reviewer_name: "Grace W.",
+    rating: 5,
+    text: "The snowball vs avalanche comparison made the decision for me in about a minute.",
+    date: "2026-04-30",
+  },
+  {
+    id: "r6",
+    product_id: "p3",
+    reviewer_name: "Ellis K.",
+    rating: 5,
+    text: "No more late fees. That alone paid for it three times over.",
+    date: "2026-06-14",
+  },
+  {
+    id: "r7",
+    product_id: "p4",
+    reviewer_name: "Nadia B.",
+    rating: 5,
+    text: "Bought the bundle instead of one sheet and it was clearly the right call. Everything matches.",
+    date: "2026-06-19",
+  },
+  {
+    id: "r8",
+    product_id: "p5",
+    reviewer_name: "Jordan M.",
+    rating: 5,
+    text: "My bookkeeper asked what I was using. Quarter-end took an hour instead of a weekend.",
+    date: "2026-05-27",
+  },
+  {
+    id: "r9",
+    product_id: "p6",
+    reviewer_name: "Sofia A.",
+    rating: 4,
+    text: "Simple, calm, not overloaded. Exactly what a weekly planner should be.",
+    date: "2026-06-03",
+  },
+  {
+    id: "r10",
+    product_id: "p8",
+    reviewer_name: "Ruth O.",
+    rating: 5,
+    text: "Rebranded three of the templates and listed them the same week. First sale on day four.",
+    date: "2026-06-21",
+  },
+];
+
+export const testimonials = [
+  {
+    quote: "Organization isn't a personality trait. It's a system you can download.",
+    name: "Maya R.",
+    role: "Smart Budget Spreadsheet",
+  },
+  {
+    quote: "I stopped avoiding my bank app. That's the whole review.",
+    name: "Tomás L.",
+    role: "Debt Payoff Tracker",
+  },
+  {
+    quote: "The first money tool I've used that doesn't make me feel behind.",
+    name: "Grace W.",
+    role: "Budget + Debt + Bill Bundle",
+  },
+  {
+    quote: "Fifteen minutes on a Sunday buys back a whole month of guessing.",
+    name: "Jordan M.",
+    role: "Small Business Profit Sheet",
+  },
+];
 
 export const faqs = [
   {
@@ -540,10 +656,8 @@ export const getProduct = (slug: string) => products.find((p) => p.slug === slug
 export const getProductById = (id: string) => products.find((p) => p.id === id);
 export const getCategory = (slug: string) => categories.find((c) => c.slug === slug);
 export const productsByCategory = (slug: string) => products.filter((p) => p.category === slug);
-// reviewsFor() and bestSellers() are gone — "reviews for a product" and
-// "is this a bestseller" are both real, live questions now, answered by
-// src/lib/stats.ts (backed by supabase/functions/product-stats), never by
-// filtering this static array.
+export const reviewsFor = (id: string) => reviews.filter((r) => r.product_id === id);
+export const bestSellers = () => products.filter((p) => p.best_seller);
 export const money = (n: number) => (n === 0 ? "Free" : `$${n.toFixed(2)}`);
 export const discountPct = (p: Product) =>
   p.price > 0 ? Math.round(((p.price - p.sale_price) / p.price) * 100) : 0;

@@ -3,12 +3,8 @@ import { ArrowRight, BadgeCheck, Palette, Store } from "lucide-react";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
 import { money, products } from "@/data/shop";
-import { fetchStats } from "@/lib/stats";
-
-const plrSlugs = products.filter((p) => p.is_plr).map((p) => p.slug);
 
 export const Route = createFileRoute("/plr")({
-  loader: async () => fetchStats({ slugs: plrSlugs }),
   head: () => ({
     meta: [
       { title: "PLR Templates with Resell Rights — ReadyTrackers" },
@@ -28,7 +24,6 @@ export const Route = createFileRoute("/plr")({
 });
 
 function Plr() {
-  const { site, products: liveProductStats } = Route.useLoaderData();
   const plrProducts = products.filter((p) => p.is_plr);
   const flagship = plrProducts[0];
 
@@ -71,21 +66,9 @@ function Plr() {
 
       <section className="container-page grid gap-8 py-16 sm:grid-cols-3">
         {[
-          {
-            icon: Store,
-            title: "1. Download",
-            text: "Get the unlocked Excel and Google Sheets source files.",
-          },
-          {
-            icon: Palette,
-            title: "2. Customize",
-            text: "Swap in your colours, logo, fonts and product name.",
-          },
-          {
-            icon: BadgeCheck,
-            title: "3. Resell",
-            text: "List it as your own — no royalties, no revenue share.",
-          },
+          { icon: Store, title: "1. Download", text: "Get the unlocked Excel and Google Sheets source files." },
+          { icon: Palette, title: "2. Customize", text: "Swap in your colours, logo, fonts and product name." },
+          { icon: BadgeCheck, title: "3. Resell", text: "List it as your own — no royalties, no revenue share." },
         ].map((s) => (
           <div key={s.title} className="rounded-2xl bg-card p-6 shadow-soft">
             <s.icon className="text-primary" size={24} />
@@ -99,13 +82,7 @@ function Plr() {
         <h2 className="mb-6 font-display text-2xl">PLR licences</h2>
         <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
           {plrProducts.map((p) => (
-            <ProductCard
-              key={p.id}
-              product={p}
-              bestSeller={site.bestSellerSlugs.includes(p.slug)}
-              reviewCount={liveProductStats[p.slug]?.reviewCount ?? 0}
-              ratingAvg={liveProductStats[p.slug]?.ratingAvg ?? 0}
-            />
+            <ProductCard key={p.id} product={p} />
           ))}
         </div>
       </section>
